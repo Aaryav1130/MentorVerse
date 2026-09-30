@@ -50,7 +50,7 @@ export default function StudentLayout({
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-400 font-sans flex flex-col">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-b border-[#1e293b]">
+      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-borderorder border-[#1e293b]">
         <div className="flex h-16 items-center px-4 md:px-6">
           <button 
             className="mr-4 md:hidden text-slate-400 hover:text-white"
@@ -59,13 +59,9 @@ export default function StudentLayout({
             <Menu className="h-6 w-6" />
           </button>
           
-          <Link href="/" className="flex items-center gap-2 mr-6">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 font-bold text-black">
-              M
-            </div>
-            <span className="hidden font-bold text-white sm:inline-block">
-              MentorVerse
-            </span>
+          <Link href="/" className="flex items-center mr-6 group">
+            <img src="/brand/seniorly-logo-on-dark.svg" alt="Seniorly Logo" className="h-8 w-auto hidden sm:block transition-transform group-hover:scale-105" />
+            <img src="/brand/seniorly-icon.svg" alt="Seniorly Icon" className="h-8 w-auto sm:hidden transition-transform group-hover:scale-105" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -82,7 +78,7 @@ export default function StudentLayout({
                 >
                   {item.name}
                   {isActive && (
-                    <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-emerald-400 rounded-t-full" />
+                    <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-brand-light rounded-t-full" />
                   )}
                 </Link>
               );
@@ -95,16 +91,16 @@ export default function StudentLayout({
               <input
                 type="search"
                 placeholder="Search..."
-                className="h-9 w-[200px] lg:w-[300px] rounded-lg bg-[#141b2d] pl-9 pr-4 text-sm outline-none border border-[#1e293b] focus:border-emerald-500/50 text-white placeholder:text-slate-500"
+                className="h-9 w-[200px] lg:w-[300px] rounded-lg bg-[#141b2d] pl-9 pr-4 text-sm outline-none border border-[#1e293b] focus:border-borderordermerald-500/50 text-white placeholder:text-slate-500"
               />
             </div>
             <button className="relative text-slate-400 hover:text-white transition-colors">
               <Bell className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-cardrand-primary text-[10px] font-bold text-white">
                 3
               </span>
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 font-medium text-white hover:bg-emerald-500 transition-colors">
+            <button className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 font-medium text-white hover:bg-cardrand-primary transition-colors">
               P
             </button>
           </div>
@@ -131,11 +127,11 @@ export default function StudentLayout({
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-[#141b2d] text-emerald-400"
+                      ? "bg-[#141b2d] text-brand-light"
                       : "text-slate-400 hover:text-white hover:bg-[#141b2d]/50"
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", isActive ? "text-emerald-400" : "text-slate-400")} />
+                  <Icon className={cn("h-4 w-4", isActive ? "text-brand-light" : "text-slate-400")} />
                   {item.name}
                 </Link>
               );
@@ -146,7 +142,7 @@ export default function StudentLayout({
         {/* Mobile Sidebar Overlay */}
         {mobileMenuOpen && (
           <div 
-            className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+            className="fixed inset-0 bg-cardlack/50 z-30 md:hidden" 
             onClick={() => setMobileMenuOpen(false)}
           />
         )}

@@ -1,15 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white">
       {/* Top Nav */}
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#1e293b]">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center font-bold text-black text-sm">
-            M
-          </div>
-          <span className="text-xl font-bold">MentorVerse</span>
+        <div className="flex items-center">
+          <Image src="/seniorly-logo.png" alt="Seniorly Logo" width={140} height={40} className="h-9 w-auto bg-white px-2 py-1 rounded-md" />
         </div>
         <div className="flex items-center gap-8">
           <Link href="/" className="text-white font-medium">Home</Link>
@@ -42,7 +40,7 @@ export default function HomePage() {
             </h1>
             <p className="text-lg text-slate-400 mb-8">
               Connect with expert mentors, get personalized guidance, and track
-              your progress — all in one place.
+              your progress — all in one place, now with AI support.
             </p>
 
             {/* Search Bar */}

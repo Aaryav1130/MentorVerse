@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MentorVerse — Your Goals. The Right Mentor.",
+  title: "Seniorly — Your Goals. The Right Mentor.",
   description:
-    "Connect with expert mentors, get personalized guidance, and track your progress — all in one place. The ultimate platform for JEE, NEET & GATE aspirants.",
+    "Connect with expert mentors, get personalized guidance, and track your progress — all in one place, now with AI support. The ultimate platform for JEE, NEET & GATE aspirants.",
 };
 
 export default function RootLayout({

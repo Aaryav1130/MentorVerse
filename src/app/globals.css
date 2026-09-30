@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a0e1a;
+  --color-brand-primary: #4F46E5;
+  --color-brand-light: #6366F1;
+  --color-brand-accent: #FBBF24;
+  --color-brand-deep: #1E1B4B;
+  --color-text-primary: #0F172A;
+  --color-on-dark-accent: #A5B4FC;
+  
+  /* Overrides for dark theme usage matching brand */
+  --color-background: var(--color-brand-deep);
   --color-foreground: #f8fafc;
-  --color-card: #141b2d;
-  --color-card-hover: #1a2332;
-  --color-sidebar: #0f1419;
-  --color-border: #1e293b;
-  --color-accent-gold: #f59e0b;
-  --color-accent-green: #10b981;
-  --color-accent-red: #ef4444;
-  --color-accent-blue: #3b82f6;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+  --color-card: #282463; /* slightly lighter than deep */
+  --color-sidebar: #191640; /* slightly darker deep */
+  --color-border: #312E81;
+  
   --font-sans: var(--font-inter);
+  --font-heading: var(--font-poppins);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b #0a0e1a;
+  scrollbar-color: var(--color-brand-primary) var(--color-brand-deep);
 }
 
 body {
@@ -28,6 +30,10 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), system-ui, sans-serif;
 }
 
 /* Custom scrollbar for webkit */

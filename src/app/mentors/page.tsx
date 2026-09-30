@@ -15,10 +15,10 @@ export default function MentorsListingPage() {
     <div className="min-h-screen bg-[#0a0e1a] font-sans">
       
       {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-b border-[#1e293b]">
+      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-borderorder border-[#1e293b]">
         <div className="flex h-16 items-center px-4 md:px-8 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2 mr-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 font-bold text-black">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cardrand-accent font-bold text-black">
               M
             </div>
             <span className="font-bold text-white hidden sm:inline-block">
@@ -33,7 +33,7 @@ export default function MentorsListingPage() {
           </nav>
           <div className="ml-auto flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-white hover:text-slate-200">Login</Link>
-            <button className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+            <button className="px-4 py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors">
               Get Started
             </button>
           </div>
@@ -55,7 +55,7 @@ export default function MentorsListingPage() {
             <input
               type="text"
               placeholder="Search mentors, subjects, or expertise..."
-              className="w-full h-12 pl-12 pr-4 bg-[#141b2d] border border-[#1e293b] rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50"
+              className="w-full h-12 pl-12 pr-4 bg-[#141b2d] border border-[#1e293b] rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-borderordermerald-500/50"
             />
             <button className="absolute right-2 top-2 p-2 text-slate-400 hover:text-white">
               <Filter className="w-5 h-5" />
@@ -70,7 +70,7 @@ export default function MentorsListingPage() {
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
                   activeFilter === filter
-                    ? "bg-amber-500 text-black"
+                    ? "bg-cardrand-accent text-black"
                     : "bg-[#141b2d] text-slate-300 border border-[#1e293b] hover:border-slate-500"
                 )}
               >
@@ -83,13 +83,13 @@ export default function MentorsListingPage() {
         {/* Mentor Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {publicMentors.map((mentor) => (
-            <div key={mentor.id} className="bg-[#141b2d] border border-[#1e293b] rounded-xl p-6 flex flex-col sm:flex-row gap-6 hover:border-emerald-500/30 transition-colors">
+            <div key={mentor.id} className="bg-[#141b2d] border border-[#1e293b] rounded-xl p-6 flex flex-col sm:flex-row gap-6 hover:border-borderordermerald-500/30 transition-colors">
               <div className="flex flex-col items-center shrink-0">
                 <div className={cn("w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2", mentor.color)}>
                   {mentor.initials}
                 </div>
-                <div className="flex items-center gap-1 text-sm font-medium text-amber-400">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> {mentor.rating}
+                <div className="flex items-center gap-1 text-sm font-medium text-brand-accent">
+                  <Star className="w-4 h-4 fill-amber-400 text-brand-accent" /> {mentor.rating}
                 </div>
                 <div className="text-xs text-slate-500">({mentor.students})</div>
               </div>
@@ -98,7 +98,7 @@ export default function MentorsListingPage() {
                 <div className="flex justify-between items-start mb-1">
                   <h3 className="text-xl font-bold text-white">{mentor.name}</h3>
                 </div>
-                <p className="text-emerald-400 font-medium text-sm mb-3">{mentor.title}</p>
+                <p className="text-brand-light font-medium text-sm mb-3">{mentor.title}</p>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {mentor.tags.map(tag => (
@@ -110,7 +110,7 @@ export default function MentorsListingPage() {
                 
                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-[#1e293b]">
                   <div className="font-bold text-white">{mentor.price} <span className="text-xs text-slate-400 font-normal">/ session</span></div>
-                  <Link href={`/mentors/${mentor.id}`} className="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                  <Link href={`/mentors/${mentor.id}`} className="text-sm font-medium text-brand-light hover:text-on-dark-accent flex items-center gap-1">
                     View Profile &rarr;
                   </Link>
                 </div>

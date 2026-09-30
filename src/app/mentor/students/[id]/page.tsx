@@ -28,7 +28,7 @@ export default function StudentDetailsPage({ params }: { params: { id: string } 
       {/* Header Profile */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+          <div className="w-16 h-16 rounded-full bg-cardlue-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
             {princeDetails.initials}
           </div>
           <div>
@@ -55,14 +55,14 @@ export default function StudentDetailsPage({ params }: { params: { id: string } 
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-[#1e293b] overflow-x-auto">
+      <div className="border-border border-[#1e293b] overflow-x-auto">
         <div className="flex gap-8 min-w-max">
           {tabs.map((tab) => (
             <button
               key={tab}
               className={cn(
                 "pb-4 font-medium text-sm transition-colors relative",
-                activeTab === tab ? "text-amber-400" : "text-slate-400 hover:text-white"
+                activeTab === tab ? "text-brand-accent" : "text-slate-400 hover:text-white"
               )}
             >
               {tab}
@@ -141,7 +141,7 @@ export default function StudentDetailsPage({ params }: { params: { id: string } 
 
           {/* Next Target Card */}
           <div className="bg-gradient-to-r from-[#141b2d] to-[#1e293b] rounded-xl border border-[#1e293b] p-6">
-            <h3 className="text-amber-400 font-semibold mb-2">Next Target</h3>
+            <h3 className="text-brand-accent font-semibold mb-2">Next Target</h3>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <p className="text-xl font-bold text-white">{princeDetails.nextTarget.title}</p>

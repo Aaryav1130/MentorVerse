@@ -18,7 +18,7 @@ export default function MentorDashboard() {
       </div>
 
       {/* Motivational quote */}
-      <div className="italic text-slate-400 border-l-2 border-amber-500 pl-4 py-1">
+      <div className="italic text-slate-400 border-l-2 border-borderorderrand-accent pl-4 py-1">
         "A great mentor doesn't just teach, they build confidence."
       </div>
 
@@ -27,10 +27,10 @@ export default function MentorDashboard() {
         {/* Total Students */}
         <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+            <div className="w-12 h-12 rounded-lg bg-cardlue-500/10 flex items-center justify-center text-blue-500">
               <Users className="w-6 h-6" />
             </div>
-            <span className="text-emerald-500 text-sm font-medium bg-emerald-500/10 px-2 py-1 rounded-md">
+            <span className="text-brand-primary text-sm font-medium bg-cardrand-primary/10 px-2 py-1 rounded-md">
               ↑ {mentorStats.totalStudents.trend}%
             </span>
           </div>
@@ -41,10 +41,10 @@ export default function MentorDashboard() {
         {/* Active Rooms */}
         <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+            <div className="w-12 h-12 rounded-lg bg-cardrand-primary/10 flex items-center justify-center text-brand-primary">
               <Video className="w-6 h-6" />
             </div>
-            <span className="text-emerald-500 text-sm font-medium bg-emerald-500/10 px-2 py-1 rounded-md">
+            <span className="text-brand-primary text-sm font-medium bg-cardrand-primary/10 px-2 py-1 rounded-md">
               ↑ {mentorStats.activeRooms.trend}%
             </span>
           </div>
@@ -55,10 +55,10 @@ export default function MentorDashboard() {
         {/* Monthly Earnings */}
         <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <div className="w-12 h-12 rounded-lg bg-cardrand-accent/10 flex items-center justify-center text-brand-accent">
               <IndianRupee className="w-6 h-6" />
             </div>
-            <span className="text-emerald-500 text-sm font-medium bg-emerald-500/10 px-2 py-1 rounded-md">
+            <span className="text-brand-primary text-sm font-medium bg-cardrand-primary/10 px-2 py-1 rounded-md">
               ↑ {mentorStats.monthlyEarnings.trend}%
             </span>
           </div>
@@ -72,14 +72,14 @@ export default function MentorDashboard() {
         <div className="lg:col-span-1 space-y-8">
           {/* Today's Sessions */}
           <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] overflow-hidden flex flex-col h-[400px]">
-            <div className="p-6 border-b border-[#1e293b] flex-shrink-0">
+            <div className="p-6 border-borderorder border-[#1e293b] flex-shrink-0">
               <h2 className="text-lg font-semibold text-white">Today's Sessions</h2>
             </div>
             <div className="p-6 flex-1 overflow-y-auto space-y-4">
               {todaysSessions.map((session) => (
                 <div key={session.id} className="p-4 rounded-xl border border-[#1e293b] bg-[#0a0e1a]">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded">
+                    <span className="text-xs font-medium text-brand-accent bg-cardrand-accent/10 px-2 py-1 rounded">
                       {session.type}
                     </span>
                     {session.isLive && (
@@ -93,7 +93,7 @@ export default function MentorDashboard() {
                   <p className="text-sm text-slate-400 mb-4">{session.time}</p>
                   
                   {session.isLive ? (
-                    <button className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    <button className="w-full py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors">
                       Join Room
                     </button>
                   ) : (

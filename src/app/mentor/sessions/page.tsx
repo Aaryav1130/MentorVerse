@@ -12,7 +12,7 @@ export default function SessionsPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Sessions</h1>
           <p className="text-slate-400">Join live classes, conduct 1:1 sessions and manage your calendar.</p>
         </div>
-        <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+        <button className="flex items-center gap-2 bg-cardrand-primary hover:bg-cardrand-light text-white px-4 py-2 rounded-lg font-medium transition-colors">
           <Plus className="w-5 h-5" />
           Create Session
         </button>
@@ -42,7 +42,7 @@ export default function SessionsPage() {
                 <div 
                   key={date} 
                   className={`py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
-                    date === 13 ? 'bg-blue-500 text-white' : 'text-slate-300 hover:bg-[#1e293b]'
+                    date === 13 ? 'bg-cardlue-500 text-white' : 'text-slate-300 hover:bg-[#1e293b]'
                   }`}
                 >
                   {date}
@@ -75,7 +75,7 @@ export default function SessionsPage() {
                         Live Now
                       </span>
                     )}
-                    <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-md">
+                    <span className="text-xs font-medium text-brand-accent bg-cardrand-accent/10 px-2.5 py-1 rounded-md">
                       {session.type}
                     </span>
                   </div>
@@ -96,7 +96,7 @@ export default function SessionsPage() {
 
                 <div className="flex-shrink-0">
                   {session.isLive || session.type === "Group Doubt" ? (
-                    <button className="w-full md:w-auto px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors">
+                    <button className="w-full md:w-auto px-6 py-2.5 bg-cardrand-primary hover:bg-cardrand-light text-white font-medium rounded-lg transition-colors">
                       Join Room
                     </button>
                   ) : (

@@ -22,10 +22,10 @@ export default function StudyPlanPage() {
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             {goal} <ArrowRight className="w-5 h-5 text-slate-400" />
           </h2>
-          <span className="text-emerald-400 font-bold">{progress}%</span>
+          <span className="text-brand-light font-bold">{progress}%</span>
         </div>
         <div className="w-full h-3 bg-[#0a0e1a] rounded-full overflow-hidden border border-[#1e293b]">
-          <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-cardrand-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -45,8 +45,8 @@ export default function StudyPlanPage() {
               <div className="hidden md:flex flex-col items-center mt-4">
                 <div className={cn(
                   "w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg border-4 border-[#0a0e1a]",
-                  isCompleted ? "bg-emerald-500 text-white" : 
-                  isInProgress ? "bg-blue-500 text-white" : "bg-[#1e293b] text-slate-400"
+                  isCompleted ? "bg-cardrand-primary text-white" : 
+                  isInProgress ? "bg-cardlue-500 text-white" : "bg-[#1e293b] text-slate-400"
                 )}>
                   {index + 1}
                 </div>
@@ -56,7 +56,7 @@ export default function StudyPlanPage() {
               <div className={cn(
                 "flex-1 rounded-xl border p-5 transition-colors",
                 isCompleted ? "bg-[#141b2d] border-[#1e293b]" :
-                isInProgress ? "bg-[#141b2d] border-blue-500/50" : "bg-[#0a0e1a] border-[#1e293b] opacity-75"
+                isInProgress ? "bg-[#141b2d] border-borderorderlue-500/50" : "bg-[#0a0e1a] border-[#1e293b] opacity-75"
               )}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -67,8 +67,8 @@ export default function StudyPlanPage() {
                   {/* Status Badge */}
                   <div className={cn(
                     "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium w-fit",
-                    isCompleted ? "bg-emerald-500/10 text-emerald-400" :
-                    isInProgress ? "bg-blue-500/10 text-blue-400" : "bg-slate-800 text-slate-400"
+                    isCompleted ? "bg-cardrand-primary/10 text-brand-light" :
+                    isInProgress ? "bg-cardlue-500/10 text-blue-400" : "bg-slate-800 text-slate-400"
                   )}>
                     {isCompleted && <CheckCircle2 className="w-3 h-3" />}
                     {isInProgress && <Clock className="w-3 h-3" />}
@@ -96,7 +96,7 @@ export default function StudyPlanPage() {
       {/* Footer */}
       <div className="mt-12 text-center bg-[#141b2d] rounded-xl border border-[#1e293b] p-8">
         <p className="text-lg text-slate-300 italic mb-6">"Progress is not about being perfect, it's about being better than yesterday."</p>
-        <button className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors">
+        <button className="px-6 py-3 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg font-medium transition-colors">
           Keep Going &rarr;
         </button>
       </div>

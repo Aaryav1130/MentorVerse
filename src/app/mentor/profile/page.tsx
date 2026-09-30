@@ -15,7 +15,7 @@ export default function ProfilePage() {
 
       {/* Main Profile Card */}
       <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-8 flex flex-col md:flex-row gap-8 items-start">
-        <div className="w-32 h-32 rounded-full bg-amber-500 flex-shrink-0 flex items-center justify-center text-white font-bold text-4xl shadow-xl border-4 border-[#0a0e1a]">
+        <div className="w-32 h-32 rounded-full bg-cardrand-accent flex-shrink-0 flex items-center justify-center text-white font-bold text-4xl shadow-xl border-4 border-[#0a0e1a]">
           {mentorProfile.initials}
         </div>
         
@@ -26,10 +26,10 @@ export default function ProfilePage() {
                 {mentorProfile.name}
                 <BadgeCheck className="w-6 h-6 text-blue-500" />
               </h2>
-              <p className="text-amber-400 font-medium">{mentorProfile.title}</p>
+              <p className="text-brand-accent font-medium">{mentorProfile.title}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
                 <span className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <Star className="w-4 h-4 text-brand-accent fill-amber-500" />
                   {mentorProfile.rating} ({mentorProfile.reviews} reviews)
                 </span>
                 <span>•</span>
@@ -114,7 +114,7 @@ export default function ProfilePage() {
 
         {/* Right Column - Quick Settings */}
         <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] overflow-hidden flex flex-col h-full">
-          <div className="p-6 border-b border-[#1e293b]">
+          <div className="p-6 border-borderorder border-[#1e293b]">
             <h3 className="text-lg font-semibold text-white">Quick Settings</h3>
           </div>
           
@@ -127,7 +127,7 @@ export default function ProfilePage() {
             ].map((setting, idx) => (
               <button key={idx} className="w-full p-6 flex items-center justify-between hover:bg-[#0a0e1a]/50 transition-colors text-left group">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#0a0e1a] border border-[#1e293b] flex items-center justify-center text-slate-400 group-hover:text-amber-400 group-hover:border-amber-400/30 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-[#0a0e1a] border border-[#1e293b] flex items-center justify-center text-slate-400 group-hover:text-brand-accent group-hover:border-amber-400/30 transition-colors">
                     <setting.icon className="w-5 h-5" />
                   </div>
                   <div>

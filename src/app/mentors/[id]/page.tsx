@@ -15,10 +15,10 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
     <div className="min-h-screen bg-[#0a0e1a] font-sans pb-20">
       
       {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-b border-[#1e293b]">
+      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-border border-[#1e293b]">
         <div className="flex h-16 items-center px-4 md:px-8 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2 mr-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 font-bold text-black">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cardrand-accent font-bold text-black">
               M
             </div>
             <span className="font-bold text-white hidden sm:inline-block">
@@ -33,7 +33,7 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
           </nav>
           <div className="ml-auto flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-white hover:text-slate-200">Login</Link>
-            <button className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+            <button className="px-4 py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors">
               Get Started
             </button>
           </div>
@@ -49,12 +49,12 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
         {/* Profile Header */}
         <div className="bg-[#141b2d] border border-[#1e293b] rounded-2xl p-6 md:p-8 mb-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
           {/* Background Accent */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 z-0" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cardrand-primary/5 rounded-full blur-3xl -mr-20 -mt-20 z-0" />
           
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-slate-800 border-4 border-[#0a0e1a] flex items-center justify-center text-5xl font-bold text-white shrink-0 relative z-10 shadow-xl">
             {/* Fallback initials */}
             AM
-            <div className="absolute bottom-2 right-2 w-6 h-6 bg-blue-500 rounded-full border-2 border-[#141b2d] flex items-center justify-center">
+            <div className="absolute bottom-2 right-2 w-6 h-6 bg-cardlue-500 rounded-full border-border border-[#141b2d] flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4 text-white" />
             </div>
           </div>
@@ -65,11 +65,11 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
                 <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
                   {mentorProfile.name}
                 </h1>
-                <p className="text-lg text-emerald-400 font-medium mb-4">{mentorProfile.title}</p>
+                <p className="text-lg text-brand-light font-medium mb-4">{mentorProfile.title}</p>
                 
                 <div className="flex flex-wrap items-center gap-4 text-sm mb-6">
                   <div className="flex items-center gap-1 text-slate-300">
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> 
+                    <Star className="w-4 h-4 fill-amber-400 text-brand-accent" /> 
                     <span className="font-bold text-white">{mentorProfile.rating}</span> 
                     <span className="text-slate-500">({mentorProfile.students} students)</span>
                   </div>
@@ -93,7 +93,7 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
                   <div className="text-2xl font-bold text-white">{mentorProfile.price}</div>
                   <div className="text-xs text-slate-500">per 45-min session</div>
                 </div>
-                <button className="w-full px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-bold transition-colors shadow-lg shadow-emerald-500/20">
+                <button className="w-full px-8 py-3 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg font-bold transition-colors shadow-lg shadow-brand-primary/20">
                   Book a Session
                 </button>
               </div>
@@ -102,15 +102,15 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
         </div>
 
         {/* Content Tabs */}
-        <div className="flex border-b border-[#1e293b] mb-8">
+        <div className="flex border-border border-[#1e293b] mb-8">
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "px-6 py-4 text-sm font-medium border-b-2 transition-colors",
+                "px-6 py-4 text-sm font-medium border-border-2 transition-colors",
                 activeTab === tab
-                  ? "border-emerald-500 text-emerald-400"
+                  ? "border-bordermerald-500 text-brand-light"
                   : "border-transparent text-slate-400 hover:text-slate-200"
               )}
             >
@@ -135,7 +135,7 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {mentorProfile.subjects.map((subject, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-slate-300 bg-[#141b2d] p-3 rounded-lg border border-[#1e293b]">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-primary shrink-0" />
                     <span className="text-sm">{subject}</span>
                   </div>
                 ))}
@@ -173,7 +173,7 @@ export default function MentorProfilePage({ params }: { params: { id: string } }
             </div>
 
             <div className="bg-[#141b2d] border border-[#1e293b] rounded-xl p-5 text-center">
-              <MessageSquare className="w-8 h-8 text-amber-500 mx-auto mb-3 opacity-50" />
+              <MessageSquare className="w-8 h-8 text-brand-accent mx-auto mb-3 opacity-50" />
               <p className="italic text-slate-300 text-sm">"{mentorProfile.quote}"</p>
             </div>
           </div>

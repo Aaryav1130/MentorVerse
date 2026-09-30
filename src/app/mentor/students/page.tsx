@@ -13,7 +13,7 @@ export default function StudentsPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Students</h1>
           <p className="text-slate-400">Manage your students and track their progress.</p>
         </div>
-        <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+        <button className="flex items-center gap-2 bg-cardrand-primary hover:bg-cardrand-light text-white px-4 py-2 rounded-lg font-medium transition-colors">
           <Plus className="w-5 h-5" />
           Add Student
         </button>
@@ -23,8 +23,8 @@ export default function StudentsPage() {
       <div className="flex flex-wrap gap-4">
         {[
           { label: "Total", value: studentStatsForMentor.total, color: "text-white" },
-          { label: "Active", value: studentStatsForMentor.active, color: "text-emerald-500" },
-          { label: "On Hold", value: studentStatsForMentor.onHold, color: "text-amber-500" },
+          { label: "Active", value: studentStatsForMentor.active, color: "text-brand-primary" },
+          { label: "On Hold", value: studentStatsForMentor.onHold, color: "text-brand-accent" },
           { label: "Completed", value: studentStatsForMentor.completed, color: "text-blue-500" }
         ].map((stat, idx) => (
           <div key={idx} className="bg-[#141b2d] border border-[#1e293b] rounded-lg px-4 py-2 flex items-center gap-2">
@@ -41,7 +41,7 @@ export default function StudentsPage() {
           <input 
             type="text" 
             placeholder="Search by name, exam..." 
-            className="w-full bg-[#141b2d] border border-[#1e293b] rounded-lg py-2.5 pl-10 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/50 transition-colors"
+            className="w-full bg-[#141b2d] border border-[#1e293b] rounded-lg py-2.5 pl-10 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-borderorderrand-accent/50 transition-colors"
           />
         </div>
         <button className="flex items-center gap-2 px-4 py-2.5 bg-[#141b2d] border border-[#1e293b] rounded-lg text-white hover:bg-[#1e293b] transition-colors">
@@ -55,7 +55,7 @@ export default function StudentsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#1e293b] text-sm text-slate-400">
+              <tr className="border-borderorder border-[#1e293b] text-sm text-slate-400">
                 <th className="px-6 py-4 font-medium">Student Name</th>
                 <th className="px-6 py-4 font-medium">Overall Progress</th>
                 <th className="px-6 py-4 font-medium">Test Scores</th>
@@ -72,7 +72,7 @@ export default function StudentsPage() {
                         {student.initials}
                       </div>
                       <div>
-                        <Link href={`/mentor/students/${student.id}`} className="font-medium text-white hover:text-amber-400 transition-colors">
+                        <Link href={`/mentor/students/${student.id}`} className="font-medium text-white hover:text-brand-accent transition-colors">
                           {student.name}
                         </Link>
                         <div className="mt-1">
@@ -87,7 +87,7 @@ export default function StudentsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-full max-w-[120px] h-2 bg-[#0a0e1a] rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-emerald-500 rounded-full" 
+                          className="h-full bg-cardrand-primary rounded-full" 
                           style={{ width: `${student.overallProgress}%` }}
                         />
                       </div>
@@ -98,7 +98,7 @@ export default function StudentsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-full max-w-[120px] h-2 bg-[#0a0e1a] rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-blue-500 rounded-full" 
+                          className="h-full bg-cardlue-500 rounded-full" 
                           style={{ width: `${student.scoreProgress}%` }}
                         />
                       </div>

@@ -46,7 +46,7 @@ export default function StudentDashboard() {
                   <circle cx="40" cy="40" r={radius} className="stroke-[#1e293b]" strokeWidth="8" fill="none" />
                   <circle 
                     cx="40" cy="40" r={radius} 
-                    className="stroke-emerald-500" 
+                    className="stroke-brand-primary" 
                     strokeWidth="8" fill="none" strokeLinecap="round"
                     style={{ strokeDasharray: circumference, strokeDashoffset }}
                   />
@@ -64,15 +64,15 @@ export default function StudentDashboard() {
           <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5 flex flex-col justify-between">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-white">Today</h2>
-              <Link href="/student/calendar" className="text-sm text-emerald-400 hover:text-emerald-300">
+              <Link href="/student/calendar" className="text-sm text-brand-light hover:text-on-dark-accent">
                 View Calendar &rarr;
               </Link>
             </div>
             <div className="bg-[#0a0e1a] rounded-lg p-3 border border-[#1e293b]">
-              <div className="text-xs text-amber-400 font-medium mb-1">{today.time} • {today.type}</div>
+              <div className="text-xs text-brand-accent font-medium mb-1">{today.time} • {today.type}</div>
               <div className="text-white font-medium mb-1">{today.title}</div>
               <div className="text-sm text-slate-400 mb-3">with {today.mentor}</div>
-              <button className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+              <button className="w-full py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors">
                 Join Room
               </button>
             </div>
@@ -90,7 +90,7 @@ export default function StudentDashboard() {
                   <span className="text-slate-400">{p.percentage}%</span>
                 </div>
                 <div className="w-full h-2 bg-[#1e293b] rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${p.percentage}%` }} />
+                  <div className="h-full bg-cardrand-primary rounded-full" style={{ width: `${p.percentage}%` }} />
                 </div>
               </div>
             ))}
@@ -98,9 +98,9 @@ export default function StudentDashboard() {
         </div>
 
         {/* Next Milestone */}
-        <div className="bg-[#141b2d] rounded-xl border border-amber-500/30 p-5 flex items-center justify-between">
+        <div className="bg-[#141b2d] rounded-xl border border-borderorderrand-accent/30 p-5 flex items-center justify-between">
           <div className="flex items-start gap-4">
-            <div className="mt-1 p-2 bg-amber-500/10 rounded-lg text-amber-500">
+            <div className="mt-1 p-2 bg-cardrand-accent/10 rounded-lg text-brand-accent">
               <Target className="w-5 h-5" />
             </div>
             <div>
@@ -121,8 +121,8 @@ export default function StudentDashboard() {
             { label: "Browse Resources", icon: BookOpen },
             { label: "Ask a Doubt", icon: HelpCircle },
           ].map((action, i) => (
-            <button key={i} className="flex flex-col items-center justify-center p-4 bg-[#141b2d] border border-[#1e293b] rounded-xl hover:border-emerald-500/50 transition-colors gap-2 group">
-              <action.icon className="w-6 h-6 text-slate-400 group-hover:text-emerald-400" />
+            <button key={i} className="flex flex-col items-center justify-center p-4 bg-[#141b2d] border border-[#1e293b] rounded-xl hover:border-borderordermerald-500/50 transition-colors gap-2 group">
+              <action.icon className="w-6 h-6 text-slate-400 group-hover:text-brand-light" />
               <span className="text-xs text-center text-slate-300 group-hover:text-white font-medium">{action.label}</span>
             </button>
           ))}
@@ -138,7 +138,7 @@ export default function StudentDashboard() {
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">{item.tag}</span>
                   <span className={cn(
                     "text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full",
-                    item.type === "Live Room" ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500"
+                    item.type === "Live Room" ? "bg-red-500/10 text-red-500" : "bg-cardlue-500/10 text-blue-500"
                   )}>{item.type}</span>
                 </div>
                 <h3 className="text-white font-medium mb-1 truncate">{item.title}</h3>
@@ -162,19 +162,19 @@ export default function StudentDashboard() {
         <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5">
           <h2 className="text-lg font-semibold text-white mb-4">Your Mentor</h2>
           <div className="flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-amber-500 flex items-center justify-center text-2xl mb-3 text-white overflow-hidden">
+            <div className="w-20 h-20 rounded-full bg-slate-800 border-borderorder border-borderorderrand-accent flex items-center justify-center text-2xl mb-3 text-white overflow-hidden">
               {/* Fallback avatar */}
               AM
             </div>
             <div className="flex items-center gap-1 mb-1">
               <h3 className="text-white font-bold text-lg">{mentorProfile.name}</h3>
-              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] text-white">✓</div>
+              <div className="w-4 h-4 bg-cardlue-500 rounded-full flex items-center justify-center text-[10px] text-white">✓</div>
             </div>
-            <p className="text-sm text-amber-400 mb-1">{mentorProfile.title}</p>
+            <p className="text-sm text-brand-accent mb-1">{mentorProfile.title}</p>
             <p className="text-xs text-slate-400 mb-4">⭐ {mentorProfile.rating} ({mentorProfile.students})</p>
             
             <div className="flex w-full gap-2">
-              <button className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+              <button className="flex-1 py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
                 <MessageSquare className="w-4 h-4" /> Message
               </button>
               <button className="w-10 h-10 flex items-center justify-center bg-[#0a0e1a] border border-[#1e293b] hover:bg-slate-800 rounded-lg text-green-500 transition-colors">
@@ -198,7 +198,7 @@ export default function StudentDashboard() {
               <div key={i} className="flex flex-col items-center gap-2">
                 <div className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-xs",
-                  s.completed ? "bg-emerald-500 text-white" : "bg-[#1e293b] text-slate-500"
+                  s.completed ? "bg-cardrand-primary text-white" : "bg-[#1e293b] text-slate-500"
                 )}>
                   {s.completed ? "✓" : ""}
                 </div>

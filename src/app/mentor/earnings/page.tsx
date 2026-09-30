@@ -26,7 +26,7 @@ export default function EarningsPage() {
           <p className="text-slate-400 text-sm mb-2">Total Earnings</p>
           <div className="flex items-end gap-3 mb-4">
             <h2 className="text-3xl font-bold text-white">{formatCurrency(earningsData.totalEarnings.value)}</h2>
-            <span className="text-emerald-500 text-sm font-medium mb-1 flex items-center gap-1">
+            <span className="text-brand-primary text-sm font-medium mb-1 flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
               {earningsData.totalEarnings.trend}%
             </span>
@@ -39,7 +39,7 @@ export default function EarningsPage() {
           <p className="text-slate-400 text-sm mb-2">Completed Sessions</p>
           <div className="flex items-end gap-3 mb-4">
             <h2 className="text-3xl font-bold text-white">{earningsData.completedSessions.value}</h2>
-            <span className="text-emerald-500 text-sm font-medium mb-1 flex items-center gap-1">
+            <span className="text-brand-primary text-sm font-medium mb-1 flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
               {earningsData.completedSessions.trend}%
             </span>
@@ -47,12 +47,12 @@ export default function EarningsPage() {
           <a href="#" className="text-blue-500 text-sm hover:underline">View Details</a>
         </div>
 
-        <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6 border-amber-500/30 bg-gradient-to-br from-[#141b2d] to-amber-500/5">
-          <p className="text-amber-400/80 text-sm mb-2">Pending Payout</p>
+        <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6 border-borderorderrand-accent/30 bg-gradient-to-br from-[#141b2d] to-amber-500/5">
+          <p className="text-brand-accent/80 text-sm mb-2">Pending Payout</p>
           <div className="flex items-end gap-3 mb-4">
             <h2 className="text-3xl font-bold text-white">{formatCurrency(earningsData.pendingPayout.value)}</h2>
           </div>
-          <button className="text-amber-500 text-sm hover:underline font-medium">Request Payout</button>
+          <button className="text-brand-accent text-sm hover:underline font-medium">Request Payout</button>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function EarningsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#1e293b] text-sm text-slate-400">
+              <tr className="border-borderorder border-[#1e293b] text-sm text-slate-400">
                 <th className="pb-4 font-medium">Transaction ID</th>
                 <th className="pb-4 font-medium">Description</th>
                 <th className="pb-4 font-medium">Amount</th>
@@ -112,7 +112,7 @@ export default function EarningsPage() {
                   <td className="py-4 text-white font-semibold">{formatCurrency(txn.amount)}</td>
                   <td className="py-4 text-slate-400">{txn.date}</td>
                   <td className="py-4">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-cardrand-primary/10 text-brand-primary border border-borderordermerald-500/20">
                       <CheckCircle className="w-3 h-3" />
                       {txn.status}
                     </span>

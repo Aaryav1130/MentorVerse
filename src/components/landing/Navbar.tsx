@@ -22,8 +22,8 @@ export default function Navbar() {
           <Link href="#">About</Link>
         </div>
         <div className="sl-navr">
-          <Link className="sl-btn" href="/mentor/dashboard">Log in</Link>
-          <Link className="sl-btn sl-p" href="/mentor/dashboard">Get started</Link>
+          <Link className="sl-btn" href="/login">Log in</Link>
+          <Link className="sl-btn sl-p" href="/register">Get started</Link>
         </div>
       </div>
     </nav>

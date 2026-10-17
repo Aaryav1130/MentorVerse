@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { 
   LayoutDashboard, 
   Users, 
@@ -13,10 +14,14 @@ import {
   Settings, 
   Search, 
   Bell,
-  Sparkles
+  Sparkles,
+  LogOut,
+  GraduationCap,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mentorProfile } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { title: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
@@ -35,6 +40,11 @@ export default function MentorLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user, logout, switchRole } = useAuth();
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  const displayName = user?.name || mentorProfile.name;
+  const displayInitials = user?.initials || mentorProfile.initials;
 
   return (
     <div className="flex h-screen w-full bg-[#0a0e1a] text-slate-400 font-sans">
@@ -42,7 +52,9 @@ export default function MentorLayout({
       <aside className="w-[240px] flex-shrink-0 bg-[#0f1419] border-r border-[#1e293b] flex flex-col">
         {/* Logo */}
         <div className="p-6 flex items-center">
-          <img src="/brand/seniorly-logo-on-dark.svg" alt="Seniorly Logo" className="h-8 w-auto" />
+          <Link href="/">
+            <img src="/brand/seniorly-logo-on-dark.svg" alt="Seniorly Logo" className="h-8 w-auto cursor-pointer" />
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -71,7 +83,7 @@ export default function MentorLayout({
 
         {/* Go Premium Banner */}
         <div className="p-4 mt-auto">
-          <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-borderorderrand-accent/20">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20">
             <div className="flex items-center gap-2 text-brand-accent font-semibold mb-1">
               <Sparkles className="w-4 h-4" />
               <span>Go Premium</span>
@@ -84,29 +96,91 @@ export default function MentorLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-[72px] flex-shrink-0 bg-[#0a0e1a]/80 backdrop-blur border-borderorder border-[#1e293b] flex items-center justify-between px-8 sticky top-0 z-10">
+        <header className="h-[72px] flex-shrink-0 bg-[#0a0e1a]/80 backdrop-blur border-b border-[#1e293b] flex items-center justify-between px-8 sticky top-0 z-20">
           <div className="w-96 relative">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input 
               type="text" 
               placeholder="Search students, sessions..." 
-              className="w-full bg-[#141b2d] border border-[#1e293b] rounded-lg py-2 pl-10 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-borderorderrand-accent/50 transition-colors"
+              className="w-full bg-[#141b2d] border border-[#1e293b] rounded-lg py-2 pl-10 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400/50 transition-colors"
             />
           </div>
           
           <div className="flex items-center gap-6">
             <button className="relative text-slate-400 hover:text-white transition-colors">
               <Bell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 border-borderorder border-[#0a0e1a]"></span>
+              <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 border border-[#0a0e1a]"></span>
             </button>
-            <div className="flex items-center gap-3 pl-6 border-l border-[#1e293b]">
-              <div className="w-10 h-10 rounded-full bg-cardrand-accent flex items-center justify-center text-white font-bold">
-                {mentorProfile.initials}
-              </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-white">{mentorProfile.name}</p>
-                <p className="text-xs text-slate-500">Mentor</p>
-              </div>
+            
+            {/* User Profile Button with Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-3 pl-6 border-l border-[#1e293b] hover:opacity-90 transition-opacity text-left"
+              >
+                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold">
+                  {displayInitials}
+                </div>
+                <div className="hidden md:block">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-white">{displayName}</p>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                  </div>
+                  <p className="text-xs text-brand-accent">Mentor Account</p>
+                </div>
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {profileDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-3 w-56 rounded-xl bg-[#141b2d] border border-[#1e293b] shadow-2xl py-2 z-40 text-sm">
+                    <div className="px-4 py-2 border-b border-[#1e293b]">
+                      <p className="font-semibold text-white truncate">{displayName}</p>
+                      <p className="text-xs text-slate-400 truncate">{user?.email || "arjun.mehta@seniorly.com"}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        switchRole();
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-brand-light hover:bg-[#1a233b] flex items-center gap-2.5 transition-colors"
+                    >
+                      <GraduationCap className="w-4 h-4 text-brand-light" />
+                      <span>Switch to Student View</span>
+                    </button>
+
+                    <Link
+                      href="/mentor/profile"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="w-full text-left px-4 py-2.5 text-slate-300 hover:text-white hover:bg-[#1a233b] flex items-center gap-2.5 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-slate-400" />
+                      <span>Profile & Settings</span>
+                    </Link>
+
+                    <div className="border-t border-[#1e293b] my-1" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        logout();
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-400" />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </header>

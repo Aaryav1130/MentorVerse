@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Bell,
@@ -15,9 +16,12 @@ import {
   Video,
   BookOpen,
   HelpCircle,
-  Menu
+  Menu,
+  LogOut,
+  Briefcase,
+  ChevronDown
 } from "lucide-react";
-import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 const SIDEBAR_NAV = [
   { name: "Home", href: "/student/dashboard", icon: Home },
@@ -46,11 +50,17 @@ export default function StudentLayout({
 }) {
   const pathname = usePathname() || "";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const { user, logout, switchRole } = useAuth();
+
+  const displayName = user?.name || "Prince";
+  const displayInitials = user?.initials || "P";
+  const displayEmail = user?.email || "prince@seniorly.com";
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-400 font-sans flex flex-col">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-borderorder border-[#1e293b]">
+      <header className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur border-b border-[#1e293b]">
         <div className="flex h-16 items-center px-4 md:px-6">
           <button 
             className="mr-4 md:hidden text-slate-400 hover:text-white"
@@ -91,18 +101,87 @@ export default function StudentLayout({
               <input
                 type="search"
                 placeholder="Search..."
-                className="h-9 w-[200px] lg:w-[300px] rounded-lg bg-[#141b2d] pl-9 pr-4 text-sm outline-none border border-[#1e293b] focus:border-borderordermerald-500/50 text-white placeholder:text-slate-500"
+                className="h-9 w-[200px] lg:w-[300px] rounded-lg bg-[#141b2d] pl-9 pr-4 text-sm outline-none border border-[#1e293b] focus:border-brand-primary/50 text-white placeholder:text-slate-500"
               />
             </div>
+
             <button className="relative text-slate-400 hover:text-white transition-colors">
               <Bell className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-cardrand-primary text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-primary text-[10px] font-bold text-white">
                 3
               </span>
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 font-medium text-white hover:bg-cardrand-primary transition-colors">
-              P
-            </button>
+
+            {/* Profile Avatar & Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity pl-2"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary font-semibold text-white shadow-md">
+                  {displayInitials}
+                </div>
+                <div className="hidden lg:block">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-white truncate max-w-[100px]">{displayName}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </div>
+                  <span className="text-[10px] text-brand-light block">Student</span>
+                </div>
+              </button>
+
+              {/* Dropdown Menu */}
+              {profileDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-3 w-56 rounded-xl bg-[#141b2d] border border-[#1e293b] shadow-2xl py-2 z-50 text-sm">
+                    <div className="px-4 py-2 border-b border-[#1e293b]">
+                      <p className="font-semibold text-white truncate">{displayName}</p>
+                      <p className="text-xs text-slate-400 truncate">{displayEmail}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        switchRole();
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-brand-accent hover:bg-[#1a233b] flex items-center gap-2.5 transition-colors"
+                    >
+                      <Briefcase className="w-4 h-4 text-brand-accent" />
+                      <span>Switch to Mentor View</span>
+                    </button>
+
+                    <Link
+                      href="/student/settings"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="w-full text-left px-4 py-2.5 text-slate-300 hover:text-white hover:bg-[#1a233b] flex items-center gap-2.5 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-slate-400" />
+                      <span>Account Settings</span>
+                    </Link>
+
+                    <div className="border-t border-[#1e293b] my-1" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        logout();
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-400" />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -142,7 +221,7 @@ export default function StudentLayout({
         {/* Mobile Sidebar Overlay */}
         {mobileMenuOpen && (
           <div 
-            className="fixed inset-0 bg-cardlack/50 z-30 md:hidden" 
+            className="fixed inset-0 bg-black/50 z-30 md:hidden" 
             onClick={() => setMobileMenuOpen(false)}
           />
         )}

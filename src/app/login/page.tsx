@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { LogIn, ArrowRight, Sparkles, GraduationCap, Briefcase } from "lucide-react";
+import { LogIn, ArrowRight, Sparkles, GraduationCap, Briefcase, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,8 +31,19 @@ export default function LoginPage() {
       } else {
         router.push("/student/dashboard");
       }
-    } catch {
-      setError("Unable to sign in. Please verify your credentials.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("NO_ACCOUNT_FOUND")) {
+        setError(
+          "NO_ACCOUNT_FOUND: No registered account found with this email. Please register first to choose your role (Student or Mentor)."
+        );
+      } else if (msg.includes("INVALID_PASSWORD")) {
+        setError(
+          "INVALID_PASSWORD: Incorrect password. Please check your password and try again."
+        );
+      } else {
+        setError("Unable to sign in. Please check your credentials or register a new account.");
+      }
     } finally {
       setLoading(false);
     }
@@ -41,12 +52,23 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      // Default Google quick login routes based on entered email or defaults to student
-      const user = await login(email || "student@gmail.com");
+      setError("");
+      // If user typed an email, try that; otherwise test demo student
+      const targetEmail = email.trim() || "prince@seniorly.com";
+      const user = await login(targetEmail);
       if (user.role === "mentor") {
         router.push("/mentor/dashboard");
       } else {
         router.push("/student/dashboard");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("NO_ACCOUNT_FOUND")) {
+        setError(
+          "NO_ACCOUNT_FOUND: No registered account found with this Google email. Please register first to choose your role (Student or Mentor)."
+        );
+      } else {
+        setError("Google authentication failed. Please register or verify your account.");
       }
     } finally {
       setLoading(false);
@@ -97,9 +119,33 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Actionable Error Alert */}
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm text-center">
-              {error}
+            <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-left">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="text-xs sm:text-sm font-bold text-red-300 mb-1">
+                    {error.includes("NO_ACCOUNT_FOUND")
+                      ? "No Account Found"
+                      : error.includes("INVALID_PASSWORD")
+                      ? "Incorrect Password"
+                      : "Sign In Error"}
+                  </h4>
+                  <p className="text-xs text-red-400 leading-relaxed mb-3">
+                    {error.replace(/^[A-Z_]+:\s*/, "")}
+                  </p>
+                  {error.includes("NO_ACCOUNT_FOUND") && (
+                    <Link
+                      href="/register"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white font-semibold text-xs hover:bg-red-600 transition-colors shadow-sm"
+                    >
+                      <span>Register as Student or Mentor</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -149,7 +195,10 @@ export default function LoginPage() {
                 required
                 placeholder="name@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError("");
+                }}
                 className="w-full bg-[#0a0e1a] border border-[#1e293b] rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-primary text-sm transition-colors"
               />
             </div>
@@ -163,7 +212,7 @@ export default function LoginPage() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    alert("Password reset instructions sent to your email.");
+                    alert("If you're using a demo account, password is: password123");
                   }}
                   className="text-xs text-brand-light hover:underline"
                 >
@@ -175,7 +224,10 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError("");
+                }}
                 className="w-full bg-[#0a0e1a] border border-[#1e293b] rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-primary text-sm transition-colors"
               />
             </div>
@@ -200,7 +252,7 @@ export default function LoginPage() {
           <div className="mt-6 pt-5 border-t border-[#1e293b]">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2.5">
               <Sparkles className="w-3.5 h-3.5 text-brand-accent" />
-              <span>Instant Demo Logins (Test Each UI):</span>
+              <span>Instant Demo Logins (Test Pre-saved Profiles):</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -211,7 +263,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center gap-1.5 text-brand-accent text-xs font-semibold mb-1">
                   <Briefcase className="w-3.5 h-3.5" />
-                  <span>Mentor UI</span>
+                  <span>Demo Mentor</span>
                 </div>
                 <div className="text-[11px] text-white font-medium group-hover:text-brand-accent transition-colors truncate">
                   Dr. Arjun Mehta
@@ -228,7 +280,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center gap-1.5 text-brand-light text-xs font-semibold mb-1">
                   <GraduationCap className="w-3.5 h-3.5" />
-                  <span>Student UI</span>
+                  <span>Demo Student</span>
                 </div>
                 <div className="text-[11px] text-white font-medium group-hover:text-brand-light transition-colors truncate">
                   Prince
@@ -246,7 +298,7 @@ export default function LoginPage() {
               href="/register"
               className="text-brand-light hover:text-white font-semibold inline-flex items-center gap-1 ml-1"
             >
-              <span>Get started</span>
+              <span>Get started / Register</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

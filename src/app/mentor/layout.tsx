@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { mentorProfile } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const navItems = [
   { title: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
@@ -107,10 +108,7 @@ export default function MentorLayout({
           </div>
           
           <div className="flex items-center gap-6">
-            <button className="relative text-slate-400 hover:text-white transition-colors">
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 border border-[#0a0e1a]"></span>
-            </button>
+            <NotificationBell role="mentor" />
             
             {/* User Profile Button with Dropdown */}
             <div className="relative">

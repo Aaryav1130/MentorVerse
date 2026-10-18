@@ -5,6 +5,30 @@ import { useRouter } from "next/navigation";
 
 export type UserRole = "student" | "mentor";
 
+export interface AssignedMentor {
+  id: string;
+  name: string;
+  initials: string;
+  title: string;
+  rating: number;
+  students: string;
+  price: string;
+  college?: string;
+}
+
+export interface StudentSubject {
+  subject: string;
+  percentage: number;
+}
+
+export interface BookedSession {
+  id: string;
+  title: string;
+  time: string;
+  mentor: string;
+  type: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -15,6 +39,60 @@ export interface User {
   headline?: string;
   targetExam?: string;
   college?: string;
+  phone?: string;
+  bio?: string;
+  isDemo?: boolean;
+  assignedMentor?: AssignedMentor | null;
+  goalProgress?: number;
+  streakDays?: number;
+  subjects?: StudentSubject[];
+  sessionsBooked?: BookedSession[];
+}
+
+export function getDefaultSubjectsForExam(targetExam: string = ""): StudentSubject[] {
+  const lower = targetExam.toLowerCase();
+  if (lower.includes("cs") || lower.includes("computer") || lower.includes("coding")) {
+    return [
+      { subject: "Data Structures & Algorithms", percentage: 0 },
+      { subject: "Operating Systems & Databases", percentage: 0 },
+      { subject: "Computer Networks", percentage: 0 },
+      { subject: "Theory of Computation & Compiler", percentage: 0 },
+    ];
+  }
+  if (lower.includes("jee")) {
+    return [
+      { subject: "Physics (Mechanics & Electrodynamics)", percentage: 0 },
+      { subject: "Chemistry (Organic, Inorganic & Physical)", percentage: 0 },
+      { subject: "Mathematics (Calculus & Algebra)", percentage: 0 },
+    ];
+  }
+  if (lower.includes("neet")) {
+    return [
+      { subject: "Biology (Zoology & Botany)", percentage: 0 },
+      { subject: "Chemistry", percentage: 0 },
+      { subject: "Physics", percentage: 0 },
+    ];
+  }
+  if (lower.includes("upsc")) {
+    return [
+      { subject: "General Studies & Indian Polity", percentage: 0 },
+      { subject: "CSAT & Analytical Reasoning", percentage: 0 },
+      { subject: "Current Affairs & Essay Writing", percentage: 0 },
+    ];
+  }
+  if (lower.includes("cat")) {
+    return [
+      { subject: "Quantitative Aptitude (QA)", percentage: 0 },
+      { subject: "Data Interpretation & Logical Reasoning (DILR)", percentage: 0 },
+      { subject: "Verbal Ability & Reading Comprehension (VARC)", percentage: 0 },
+    ];
+  }
+  return [
+    { subject: "Network Theory", percentage: 0 },
+    { subject: "Electrical Machines", percentage: 0 },
+    { subject: "Power Systems", percentage: 0 },
+    { subject: "Control Systems", percentage: 0 },
+  ];
 }
 
 export const DEMO_MENTOR: User = {
@@ -25,6 +103,7 @@ export const DEMO_MENTOR: User = {
   initials: "AM",
   headline: "GATE EE Expert | IIT Delhi",
   college: "IIT Delhi",
+  isDemo: true,
 };
 
 export const DEMO_STUDENT: User = {
@@ -35,6 +114,34 @@ export const DEMO_STUDENT: User = {
   initials: "P",
   headline: "Aspirant · GATE EE 2027",
   targetExam: "GATE EE 2027",
+  isDemo: true,
+  goalProgress: 68,
+  streakDays: 7,
+  assignedMentor: {
+    id: "m1",
+    name: "Dr. Arjun Mehta",
+    initials: "AM",
+    title: "GATE EE Expert | 5+ Years Experience",
+    rating: 4.9,
+    students: "1.2k+",
+    price: "₹299",
+    college: "IIT Delhi",
+  },
+  subjects: [
+    { subject: "Network Theory", percentage: 92 },
+    { subject: "Machines", percentage: 76 },
+    { subject: "Power Systems", percentage: 61 },
+    { subject: "Control Systems", percentage: 43 },
+  ],
+  sessionsBooked: [
+    {
+      id: "s1",
+      title: "Power Systems",
+      time: "6:00 PM",
+      mentor: "Dr. Arjun Mehta",
+      type: "Live Room",
+    },
+  ],
 };
 
 interface AuthContextType {
@@ -53,6 +160,11 @@ interface AuthContextType {
   }) => Promise<User>;
   logout: () => void;
   switchRole: () => void;
+  updateUserProfile: (updates: Partial<User>) => void;
+  assignMentor: (mentor: AssignedMentor) => void;
+  removeMentor: () => void;
+  bookSession: (session: BookedSession) => void;
+  updateSubjectProgress: (subjectName: string, deltaOrValue: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,7 +194,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(newUser);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-      // Set simple cookie for middleware / server compatibility
       document.cookie = `seniorly_role=${newUser.role}; path=/; max-age=604800; SameSite=Lax`;
     } catch {
       // ignore
@@ -101,15 +212,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string): Promise<User> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 400)); // smooth realistic feel
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
-    // Smart role detection:
-    // If email contains "mentor", "dr", or matches demo mentor -> login as mentor
-    // Otherwise default to student or saved preference
     const isMentor =
       email.toLowerCase().includes("mentor") ||
       email.toLowerCase().includes("arjun") ||
       email.toLowerCase() === DEMO_MENTOR.email.toLowerCase();
+
+    // Check if there is an existing stored user with this email
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.email.toLowerCase() === email.toLowerCase()) {
+          saveUserSession(parsed);
+          setIsLoading(false);
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
 
     const loggedUser: User = isMentor
       ? { ...DEMO_MENTOR, email }
@@ -126,7 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginAsDemo = (role: UserRole): User => {
-    const targetUser = role === "mentor" ? DEMO_MENTOR : DEMO_STUDENT;
+    const targetUser = role === "mentor" ? { ...DEMO_MENTOR } : { ...DEMO_STUDENT };
     saveUserSession(targetUser);
     return targetUser;
   };
@@ -148,6 +271,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .toUpperCase()
       .slice(0, 2) || "U";
 
+    const targetExam = data.targetExam || "Target Exam";
+    const subjects = data.role === "student" ? getDefaultSubjectsForExam(targetExam) : undefined;
+
     const newUser: User = {
       id: `user-${Date.now()}`,
       name: data.name,
@@ -157,14 +283,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headline:
         data.role === "mentor"
           ? `${data.college || "Senior"} Mentor`
-          : `Aspirant · ${data.targetExam || "Targeting Top College"}`,
-      targetExam: data.targetExam,
+          : `Aspirant · ${targetExam}`,
+      targetExam,
       college: data.college,
+      isDemo: false,
+      assignedMentor: null,
+      goalProgress: 0,
+      streakDays: 1,
+      subjects,
+      sessionsBooked: [],
     };
 
     saveUserSession(newUser);
     setIsLoading(false);
     return newUser;
+  };
+
+  const updateUserProfile = (updates: Partial<User>) => {
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    saveUserSession(updated);
+  };
+
+  const assignMentor = (mentor: AssignedMentor) => {
+    if (!user) return;
+    const updated: User = {
+      ...user,
+      assignedMentor: mentor,
+    };
+    saveUserSession(updated);
+  };
+
+  const removeMentor = () => {
+    if (!user) return;
+    const updated: User = {
+      ...user,
+      assignedMentor: null,
+    };
+    saveUserSession(updated);
+  };
+
+  const bookSession = (session: BookedSession) => {
+    if (!user) return;
+    const currentSessions = user.sessionsBooked || [];
+    const updated: User = {
+      ...user,
+      sessionsBooked: [session, ...currentSessions],
+    };
+    saveUserSession(updated);
+  };
+
+  const updateSubjectProgress = (subjectName: string, deltaOrValue: number) => {
+    if (!user || !user.subjects) return;
+    const updatedSubjects = user.subjects.map((s) => {
+      if (s.subject === subjectName) {
+        const newPct = Math.min(100, Math.max(0, deltaOrValue));
+        return { ...s, percentage: newPct };
+      }
+      return s;
+    });
+
+    // Compute overall goal progress as average of subjects
+    const avg = Math.round(
+      updatedSubjects.reduce((acc, curr) => acc + curr.percentage, 0) / (updatedSubjects.length || 1)
+    );
+
+    const updated: User = {
+      ...user,
+      subjects: updatedSubjects,
+      goalProgress: avg,
+    };
+    saveUserSession(updated);
   };
 
   const logout = () => {
@@ -199,6 +388,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         switchRole,
+        updateUserProfile,
+        assignMentor,
+        removeMentor,
+        bookSession,
+        updateSubjectProgress,
       }}
     >
       {children}

@@ -22,6 +22,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const SIDEBAR_NAV = [
   { name: "Home", href: "/student/dashboard", icon: Home },
@@ -105,12 +106,7 @@ export default function StudentLayout({
               />
             </div>
 
-            <button className="relative text-slate-400 hover:text-white transition-colors">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-primary text-[10px] font-bold text-white">
-                3
-              </span>
-            </button>
+            <NotificationBell role="student" />
 
             {/* Profile Avatar & Dropdown */}
             <div className="relative">

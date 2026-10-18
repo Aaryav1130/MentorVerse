@@ -49,6 +49,11 @@ export interface User {
   sessionsBooked?: BookedSession[];
 }
 
+export interface RegisteredAccount {
+  user: User;
+  password?: string;
+}
+
 export function getDefaultSubjectsForExam(targetExam: string = ""): StudentSubject[] {
   const lower = targetExam.toLowerCase();
   if (lower.includes("cs") || lower.includes("computer") || lower.includes("coding")) {
@@ -144,6 +149,17 @@ export const DEMO_STUDENT: User = {
   ],
 };
 
+const SEED_ACCOUNTS: RegisteredAccount[] = [
+  {
+    user: DEMO_MENTOR,
+    password: "password123",
+  },
+  {
+    user: DEMO_STUDENT,
+    password: "password123",
+  },
+];
+
 interface AuthContextType {
   user: User | null;
   role: UserRole | null;
@@ -170,6 +186,37 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = "seniorly_auth_user";
+const USERS_DB_KEY = "seniorly_registered_users";
+
+function getStoredRegisteredAccounts(): RegisteredAccount[] {
+  try {
+    const raw = localStorage.getItem(USERS_DB_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // Seed default accounts if nothing is saved
+  try {
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(SEED_ACCOUNTS));
+  } catch {
+    // ignore
+  }
+  return SEED_ACCOUNTS;
+}
+
+function saveRegisteredAccounts(accounts: RegisteredAccount[]) {
+  try {
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(accounts));
+  } catch {
+    // ignore
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -210,42 +257,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = async (email: string): Promise<User> => {
+  const login = async (email: string, password?: string): Promise<User> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 350));
 
-    const isMentor =
-      email.toLowerCase().includes("mentor") ||
-      email.toLowerCase().includes("arjun") ||
-      email.toLowerCase() === DEMO_MENTOR.email.toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
+    const accounts = getStoredRegisteredAccounts();
 
-    // Check if there is an existing stored user with this email
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email.toLowerCase() === email.toLowerCase()) {
-          saveUserSession(parsed);
-          setIsLoading(false);
-          return parsed;
-        }
+    // Check aliases for demo users
+    const match = accounts.find((acc) => {
+      const accEmail = acc.user.email.toLowerCase();
+      if (accEmail === normalizedEmail) return true;
+
+      // Allow convenient demo alias matching
+      if (
+        (normalizedEmail === "mentor@seniorly.com" || normalizedEmail === "mentor@gmail.com") &&
+        acc.user.role === "mentor"
+      ) {
+        return true;
       }
-    } catch {
-      // ignore
+      if (
+        (normalizedEmail === "student@seniorly.com" || normalizedEmail === "student@gmail.com") &&
+        acc.user.id === "student-1"
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    if (!match) {
+      setIsLoading(false);
+      throw new Error(
+        "NO_ACCOUNT_FOUND: No registered account found with this email. Please register first to choose your role (Student or Mentor)."
+      );
     }
 
-    const loggedUser: User = isMentor
-      ? { ...DEMO_MENTOR, email }
-      : {
-          ...DEMO_STUDENT,
-          email,
-          name: email.split("@")[0].replace(/[._]/g, " ") || "Student",
-          initials: (email[0] || "S").toUpperCase(),
-        };
+    // Password validation (if user account has a password and password was provided)
+    if (match.password && password) {
+      if (match.password !== password) {
+        setIsLoading(false);
+        throw new Error(
+          "INVALID_PASSWORD: Incorrect password. Please check your password and try again."
+        );
+      }
+    }
 
-    saveUserSession(loggedUser);
+    saveUserSession(match.user);
     setIsLoading(false);
-    return loggedUser;
+    return match.user;
   };
 
   const loginAsDemo = (role: UserRole): User => {
@@ -258,11 +317,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name: string;
     email: string;
     role: UserRole;
+    password?: string;
     targetExam?: string;
     college?: string;
   }): Promise<User> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    const normalizedEmail = data.email.trim().toLowerCase();
+    const accounts = getStoredRegisteredAccounts();
 
     const initials = data.name
       .split(" ")
@@ -294,6 +357,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       sessionsBooked: [],
     };
 
+    // Save into registered accounts repository
+    const existingIndex = accounts.findIndex(
+      (acc) => acc.user.email.toLowerCase() === normalizedEmail
+    );
+
+    const updatedAccount: RegisteredAccount = {
+      user: newUser,
+      password: data.password || "password123",
+    };
+
+    if (existingIndex >= 0) {
+      accounts[existingIndex] = updatedAccount;
+    } else {
+      accounts.push(updatedAccount);
+    }
+
+    saveRegisteredAccounts(accounts);
     saveUserSession(newUser);
     setIsLoading(false);
     return newUser;
@@ -301,7 +381,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserProfile = (updates: Partial<User>) => {
     if (!user) return;
-    const updated = { ...user, ...updates };
+    const updated: User = { ...user, ...updates };
+
+    // Also update in registered accounts repository
+    const accounts = getStoredRegisteredAccounts();
+    const idx = accounts.findIndex(
+      (a) => a.user.email.toLowerCase() === user.email.toLowerCase()
+    );
+    if (idx >= 0) {
+      accounts[idx].user = updated;
+      saveRegisteredAccounts(accounts);
+    }
+
     saveUserSession(updated);
   };
 
@@ -311,7 +402,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ...user,
       assignedMentor: mentor,
     };
-    saveUserSession(updated);
+    updateUserProfile(updated);
   };
 
   const removeMentor = () => {
@@ -320,7 +411,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ...user,
       assignedMentor: null,
     };
-    saveUserSession(updated);
+    updateUserProfile(updated);
   };
 
   const bookSession = (session: BookedSession) => {
@@ -330,7 +421,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ...user,
       sessionsBooked: [session, ...currentSessions],
     };
-    saveUserSession(updated);
+    updateUserProfile(updated);
   };
 
   const updateSubjectProgress = (subjectName: string, deltaOrValue: number) => {
@@ -343,7 +434,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return s;
     });
 
-    // Compute overall goal progress as average of subjects
     const avg = Math.round(
       updatedSubjects.reduce((acc, curr) => acc + curr.percentage, 0) / (updatedSubjects.length || 1)
     );
@@ -353,7 +443,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subjects: updatedSubjects,
       goalProgress: avg,
     };
-    saveUserSession(updated);
+    updateUserProfile(updated);
   };
 
   const logout = () => {

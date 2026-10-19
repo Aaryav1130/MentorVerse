@@ -97,10 +97,10 @@ export default function StudentsPage() {
                         <div className="flex-1 h-2 bg-[#0a0e1a] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-brand-primary rounded-full"
-                            style={{ width: `${student.progress}%` }}
+                            style={{ width: `${student.overallProgress}%` }}
                           />
                         </div>
-                        <span className="text-xs font-bold text-slate-300">{student.progress}%</span>
+                        <span className="text-xs font-bold text-slate-300">{student.overallProgress}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-300">{student.exam}</td>

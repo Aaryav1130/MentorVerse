@@ -36,6 +36,9 @@ export default function MentorRegisterPage() {
         role: "mentor",
         password,
         college,
+        rank,
+        expertise,
+        hourlyRate: rate,
       });
       router.push("/mentor/dashboard");
     } catch {
@@ -49,10 +52,13 @@ export default function MentorRegisterPage() {
     try {
       setLoading(true);
       await register({
-        name: name || "Dr. Arjun Mehta",
+        name: name || "Senior Mentor",
         email: email || "mentor@seniorly.com",
         role: "mentor",
         college,
+        rank,
+        expertise,
+        hourlyRate: rate,
       });
       router.push("/mentor/dashboard");
     } finally {

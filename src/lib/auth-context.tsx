@@ -29,6 +29,20 @@ export interface BookedSession {
   type: string;
 }
 
+export interface MentorSessionItem {
+  id: string;
+  title: string;
+  time: string;
+  type: string;
+  isLive?: boolean;
+}
+
+export interface MentorStats {
+  totalStudents: number;
+  activeRooms: number;
+  monthlyEarnings: number;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -41,12 +55,17 @@ export interface User {
   college?: string;
   phone?: string;
   bio?: string;
+  rank?: string;
+  expertise?: string[];
+  hourlyRate?: string;
   isDemo?: boolean;
   assignedMentor?: AssignedMentor | null;
   goalProgress?: number;
   streakDays?: number;
   subjects?: StudentSubject[];
   sessionsBooked?: BookedSession[];
+  mentorStats?: MentorStats;
+  mentorSessions?: MentorSessionItem[];
 }
 
 export interface RegisteredAccount {
@@ -108,7 +127,31 @@ export const DEMO_MENTOR: User = {
   initials: "AM",
   headline: "GATE EE Expert | IIT Delhi",
   college: "IIT Delhi",
+  rank: "AIR 214 · GATE EE",
+  expertise: ["Power Systems", "Network Theory", "Control Systems", "Electrical Machines"],
+  hourlyRate: "₹999 / session",
   isDemo: true,
+  mentorStats: {
+    totalStudents: 24,
+    activeRooms: 6,
+    monthlyEarnings: 124800,
+  },
+  mentorSessions: [
+    {
+      id: "1",
+      title: "GATE EE 2027 – Power Systems",
+      time: "10:00 AM - 11:00 AM",
+      type: "Group Class",
+      isLive: true,
+    },
+    {
+      id: "2",
+      title: "1:1 Session – Prince",
+      time: "04:00 PM - 05:00 PM",
+      type: "1:1 Session",
+      isLive: false,
+    },
+  ],
 };
 
 export const DEMO_STUDENT: User = {
@@ -173,6 +216,9 @@ interface AuthContextType {
     password?: string;
     targetExam?: string;
     college?: string;
+    rank?: string;
+    expertise?: string | string[];
+    hourlyRate?: string;
   }) => Promise<User>;
   logout: () => void;
   switchRole: () => void;
@@ -181,6 +227,7 @@ interface AuthContextType {
   removeMentor: () => void;
   bookSession: (session: BookedSession) => void;
   updateSubjectProgress: (subjectName: string, deltaOrValue: number) => void;
+  addMentorSession: (session: MentorSessionItem) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -201,7 +248,6 @@ function getStoredRegisteredAccounts(): RegisteredAccount[] {
     // ignore
   }
 
-  // Seed default accounts if nothing is saved
   try {
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(SEED_ACCOUNTS));
   } catch {
@@ -264,12 +310,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const normalizedEmail = email.trim().toLowerCase();
     const accounts = getStoredRegisteredAccounts();
 
-    // Check aliases for demo users
     const match = accounts.find((acc) => {
       const accEmail = acc.user.email.toLowerCase();
       if (accEmail === normalizedEmail) return true;
 
-      // Allow convenient demo alias matching
       if (
         (normalizedEmail === "mentor@seniorly.com" || normalizedEmail === "mentor@gmail.com") &&
         acc.user.role === "mentor"
@@ -292,7 +336,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
     }
 
-    // Password validation (if user account has a password and password was provided)
     if (match.password && password) {
       if (match.password !== password) {
         setIsLoading(false);
@@ -320,6 +363,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password?: string;
     targetExam?: string;
     college?: string;
+    rank?: string;
+    expertise?: string | string[];
+    hourlyRate?: string;
   }): Promise<User> => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 400));
@@ -337,6 +383,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const targetExam = data.targetExam || "Target Exam";
     const subjects = data.role === "student" ? getDefaultSubjectsForExam(targetExam) : undefined;
 
+    let expertiseList: string[] | undefined;
+    if (data.role === "mentor") {
+      if (Array.isArray(data.expertise)) {
+        expertiseList = data.expertise;
+      } else if (typeof data.expertise === "string" && data.expertise.trim()) {
+        expertiseList = data.expertise.split(",").map((s) => s.trim());
+      } else {
+        expertiseList = ["Power Systems", "Coding & DSA", "Concept Clarity"];
+      }
+    }
+
     const newUser: User = {
       id: `user-${Date.now()}`,
       name: data.name,
@@ -345,19 +402,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       initials,
       headline:
         data.role === "mentor"
-          ? `${data.college || "Senior"} Mentor`
+          ? `${data.college || "Senior"} Mentor · ${data.rank || "AIR Ranker"}`
           : `Aspirant · ${targetExam}`,
       targetExam,
       college: data.college,
+      rank: data.rank,
+      expertise: expertiseList,
+      hourlyRate: data.hourlyRate || "₹999 / session",
       isDemo: false,
       assignedMentor: null,
       goalProgress: 0,
       streakDays: 1,
       subjects,
       sessionsBooked: [],
+      mentorStats:
+        data.role === "mentor"
+          ? { totalStudents: 0, activeRooms: 0, monthlyEarnings: 0 }
+          : undefined,
+      mentorSessions: [],
     };
 
-    // Save into registered accounts repository
     const existingIndex = accounts.findIndex(
       (acc) => acc.user.email.toLowerCase() === normalizedEmail
     );
@@ -383,7 +447,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     const updated: User = { ...user, ...updates };
 
-    // Also update in registered accounts repository
     const accounts = getStoredRegisteredAccounts();
     const idx = accounts.findIndex(
       (a) => a.user.email.toLowerCase() === user.email.toLowerCase()
@@ -420,6 +483,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const updated: User = {
       ...user,
       sessionsBooked: [session, ...currentSessions],
+    };
+    updateUserProfile(updated);
+  };
+
+  const addMentorSession = (session: MentorSessionItem) => {
+    if (!user) return;
+    const current = user.mentorSessions || [];
+    const updated: User = {
+      ...user,
+      mentorSessions: [session, ...current],
+      mentorStats: {
+        totalStudents: user.mentorStats?.totalStudents || 0,
+        activeRooms: (user.mentorStats?.activeRooms || 0) + 1,
+        monthlyEarnings: user.mentorStats?.monthlyEarnings || 0,
+      },
     };
     updateUserProfile(updated);
   };
@@ -483,6 +561,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         removeMentor,
         bookSession,
         updateSubjectProgress,
+        addMentorSession,
       }}
     >
       {children}

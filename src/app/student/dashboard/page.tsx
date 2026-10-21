@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/lib/auth-context";
-import { publicMentors } from "@/lib/mock-data";
+import { useAuth, getDefaultSubjectsForExam } from "@/lib/auth-context";
+import { publicMentors, getMentorsForExam } from "@/lib/mock-data";
 import {
   ArrowRight,
   MessageSquare,
@@ -17,7 +17,7 @@ import {
   Compass
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 export default function StudentDashboard() {
@@ -28,6 +28,26 @@ export default function StudentDashboard() {
   const targetExam = user?.targetExam || "GATE CS 2027";
   const goalProgress = user?.goalProgress ?? 0;
   const isNewStudent = !user?.isDemo && !user?.assignedMentor;
+
+  // Extract clean exam identifier for query and filtering (e.g. "CAT", "NEET", "UPSC", "JEE", "GATE")
+  const examSlug = useMemo(() => {
+    const raw = (targetExam || "").trim();
+    if (!raw) return "All";
+    const lower = raw.toLowerCase();
+    if (lower.includes("cat") || lower.includes("mba")) return "CAT";
+    if (lower.includes("neet")) return "NEET";
+    if (lower.includes("upsc")) return "UPSC";
+    if (lower.includes("jee")) return "JEE";
+    if (lower.includes("coding") || lower.includes("computer")) return "Coding";
+    if (lower.includes("ese")) return "ESE";
+    if (lower.includes("gate")) return "GATE";
+    return raw.split(" ")[0] || "All";
+  }, [targetExam]);
+
+  // Recommended mentors strictly tailored to the student's exam
+  const recommendedMentors = useMemo(() => {
+    return getMentorsForExam(targetExam || examSlug).slice(0, 3);
+  }, [targetExam, examSlug]);
 
   // Donut chart logic for overall progress
   const radius = 36;
@@ -53,13 +73,11 @@ export default function StudentDashboard() {
     updateSubjectProgress(subjectName, current + 15);
   };
 
-  // Subjects fallback
-  const subjects = user?.subjects || [
-    { subject: "Data Structures & Algorithms", percentage: 0 },
-    { subject: "Operating Systems & Databases", percentage: 0 },
-    { subject: "Computer Networks", percentage: 0 },
-    { subject: "Theory of Computation & Compiler", percentage: 0 },
-  ];
+  // Subjects fallback matching student's exam stream
+  const subjects =
+    user?.subjects && user.subjects.length > 0
+      ? user.subjects
+      : getDefaultSubjectsForExam(targetExam);
 
   const sessions = user?.sessionsBooked || [];
 
@@ -101,7 +119,7 @@ export default function StudentDashboard() {
 
             {isNewStudent && (
               <Link
-                href="/mentors"
+                href={`/mentors?exam=${encodeURIComponent(examSlug)}`}
                 className="shrink-0 px-4 py-2.5 bg-brand-primary hover:bg-[#4338CA] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-brand-primary/20 flex items-center gap-1.5"
               >
                 <Compass className="w-4 h-4" />
@@ -202,7 +220,7 @@ export default function StudentDashboard() {
                   Book a 1:1 call with a senior or join a live room.
                 </p>
                 <Link
-                  href="/mentors"
+                  href={`/mentors?exam=${encodeURIComponent(examSlug)}`}
                   className="inline-block px-3 py-1.5 rounded-lg bg-brand-primary/10 border border-brand-primary/20 text-brand-light hover:bg-brand-primary hover:text-white transition-all text-xs font-medium"
                 >
                   Book 1:1 Session
@@ -272,7 +290,7 @@ export default function StudentDashboard() {
             </div>
           </div>
           <Link
-            href={user?.assignedMentor ? "/student/study-plan" : "/mentors"}
+            href={user?.assignedMentor ? "/student/study-plan" : `/mentors?exam=${encodeURIComponent(examSlug)}`}
             className="shrink-0 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs sm:text-sm font-medium border border-[#1e293b] transition-colors"
           >
             {user?.assignedMentor ? "View Roadmap →" : "Choose Mentor →"}
@@ -282,7 +300,7 @@ export default function StudentDashboard() {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "Find a Mentor", icon: Users, href: "/mentors" },
+            { label: "Find a Mentor", icon: Users, href: `/mentors?exam=${encodeURIComponent(examSlug)}` },
             { label: "Study Plan", icon: Target, href: "/student/study-plan" },
             { label: "Doubts & Q&A", icon: HelpCircle, href: "/student/sessions" },
             { label: "Preferences", icon: BookOpen, href: "/student/settings" },
@@ -309,7 +327,7 @@ export default function StudentDashboard() {
             <h2 className="text-lg font-semibold text-white">Your Mentor</h2>
             {user?.assignedMentor && (
               <Link
-                href="/mentors"
+                href={`/mentors?exam=${encodeURIComponent(examSlug)}`}
                 className="text-xs text-slate-400 hover:text-white underline underline-offset-2"
               >
                 Change
@@ -362,20 +380,28 @@ export default function StudentDashboard() {
               </p>
 
               <Link
-                href="/mentors"
+                href={`/mentors?exam=${encodeURIComponent(examSlug)}`}
                 className="w-full py-2.5 bg-brand-accent hover:bg-amber-400 text-black font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-md shadow-amber-400/20 mb-4 flex items-center justify-center gap-1.5"
               >
-                <span>Browse All Mentors</span>
+                <span>Browse {examSlug !== "All" ? `${examSlug} ` : ""}Mentors</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
               {/* Recommended Mentors Quick Pick */}
               <div className="w-full text-left pt-3 border-t border-[#1e293b]">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
-                  Recommended for You:
-                </p>
+                <div className="flex items-center justify-between mb-2.5">
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                    Recommended for {examSlug !== "All" ? examSlug : "You"}:
+                  </p>
+                  <Link
+                    href={`/mentors?exam=${encodeURIComponent(examSlug)}`}
+                    className="text-[10px] text-brand-light hover:underline font-medium"
+                  >
+                    View all &rarr;
+                  </Link>
+                </div>
                 <div className="space-y-2">
-                  {publicMentors.slice(0, 2).map((m) => (
+                  {recommendedMentors.map((m) => (
                     <div
                       key={m.id}
                       className="flex items-center justify-between p-2.5 rounded-xl bg-[#0a0e1a] border border-[#1e293b] hover:border-slate-600 transition-all text-xs"

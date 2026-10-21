@@ -1,6 +1,11 @@
 "use client";
 
-import { useAuth, getDefaultSubjectsForExam } from "@/lib/auth-context";
+import {
+  useAuth,
+  getDefaultSubjectsForExam,
+  calculateRoadmapProgress,
+  getDefaultRoadmapForExam
+} from "@/lib/auth-context";
 import { publicMentors, getMentorsForExam } from "@/lib/mock-data";
 import {
   ArrowRight,
@@ -26,8 +31,15 @@ export default function StudentDashboard() {
 
   const firstName = user?.name ? user.name.split(" ")[0] : "Student";
   const targetExam = user?.targetExam || "GATE CS 2027";
-  const goalProgress = user?.goalProgress ?? 0;
   const isNewStudent = !user?.isDemo && !user?.assignedMentor;
+
+  // Sync overall progress directly from student's study roadmap milestones
+  const goalProgress = useMemo(() => {
+    if (user?.studyRoadmap && user.studyRoadmap.length > 0) {
+      return calculateRoadmapProgress(user.studyRoadmap);
+    }
+    return user?.goalProgress ?? 0;
+  }, [user?.studyRoadmap, user?.goalProgress]);
 
   // Extract clean exam identifier for query and filtering (e.g. "CAT", "NEET", "UPSC", "JEE", "GATE")
   const examSlug = useMemo(() => {
@@ -135,10 +147,10 @@ export default function StudentDashboard() {
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-lg font-semibold text-white">Your Goal</h2>
               <Link
-                href="/student/settings"
-                className="text-xs text-brand-light hover:underline flex items-center gap-1"
+                href="/student/study-plan"
+                className="text-xs text-brand-light hover:underline flex items-center gap-1 font-medium"
               >
-                Edit Goal <ArrowRight className="w-3 h-3" />
+                Manage Goals <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
             <div className="flex items-center gap-4">

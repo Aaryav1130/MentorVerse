@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth, getDefaultSubjectsForExam, DEMO_STUDENT } from "@/lib/auth-context";
+import {
+  useAuth,
+  getDefaultSubjectsForExam,
+  getDefaultRoadmapForExam,
+  DEMO_STUDENT
+} from "@/lib/auth-context";
 import {
   User,
   Target,
@@ -76,6 +81,11 @@ export default function StudentSettingsPage() {
         ? getDefaultSubjectsForExam(fullExamString)
         : user?.subjects;
 
+    const studyRoadmap =
+      hasExamChanged && !user?.isDemo
+        ? getDefaultRoadmapForExam(fullExamString)
+        : user?.studyRoadmap;
+
     updateUserProfile({
       name,
       email,
@@ -85,6 +95,7 @@ export default function StudentSettingsPage() {
       targetExam: fullExamString,
       initials,
       subjects,
+      studyRoadmap,
     });
 
     setToast("Settings saved successfully!");
@@ -99,6 +110,7 @@ export default function StudentSettingsPage() {
       goalProgress: 0,
       streakDays: 1,
       subjects: getDefaultSubjectsForExam(fullExamString),
+      studyRoadmap: getDefaultRoadmapForExam(fullExamString),
       sessionsBooked: [],
     });
     setToast("Reset to a completely clean, fresh environment!");

@@ -43,6 +43,16 @@ export interface MentorStats {
   monthlyEarnings: number;
 }
 
+export interface RoadmapItem {
+  id: string;
+  title: string;
+  topics: number;
+  totalTopics: number;
+  tests: number;
+  status: "Completed" | "In Progress" | "Not Started";
+  targetDate?: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -63,6 +73,7 @@ export interface User {
   goalProgress?: number;
   streakDays?: number;
   subjects?: StudentSubject[];
+  studyRoadmap?: RoadmapItem[];
   sessionsBooked?: BookedSession[];
   mentorStats?: MentorStats;
   mentorSessions?: MentorSessionItem[];
@@ -116,6 +127,290 @@ export function getDefaultSubjectsForExam(targetExam: string = ""): StudentSubje
     { subject: "Electrical Machines", percentage: 0 },
     { subject: "Power Systems", percentage: 0 },
     { subject: "Control Systems", percentage: 0 },
+  ];
+}
+
+export function calculateRoadmapProgress(items: RoadmapItem[] = []): number {
+  if (!items || items.length === 0) return 0;
+  const total = items.reduce((acc, curr) => acc + (curr.totalTopics || 0), 0);
+  if (total === 0) return 0;
+  const completed = items.reduce(
+    (acc, curr) => acc + Math.min(curr.topics || 0, curr.totalTopics || 0),
+    0
+  );
+  return Math.min(100, Math.round((completed / total) * 100));
+}
+
+export function getDefaultRoadmapForExam(targetExam: string = ""): RoadmapItem[] {
+  const lower = targetExam.toLowerCase();
+
+  if (lower.includes("cat") || lower.includes("mba")) {
+    return [
+      {
+        id: "cat-1",
+        title: "Quantitative Aptitude (Arithmetic, Algebra & Geometry)",
+        topics: 0,
+        totalTopics: 14,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "cat-2",
+        title: "Data Interpretation & Logical Reasoning (DILR Caselets)",
+        topics: 0,
+        totalTopics: 12,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "cat-3",
+        title: "Verbal Ability & Reading Comprehension (VARC)",
+        topics: 0,
+        totalTopics: 12,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "cat-4",
+        title: "Full-Length Mocks & Sectional Time Management",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "cat-5",
+        title: "B-School Interview Prep (WAT-PI & SOP Writing)",
+        topics: 0,
+        totalTopics: 6,
+        tests: 0,
+        status: "Not Started",
+      },
+    ];
+  }
+
+  if (lower.includes("neet")) {
+    return [
+      {
+        id: "neet-1",
+        title: "Zoology (Human Physiology & Genetics)",
+        topics: 0,
+        totalTopics: 16,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "neet-2",
+        title: "Botany (Plant Physiology & Ecology)",
+        topics: 0,
+        totalTopics: 14,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "neet-3",
+        title: "Chemistry (Organic Mechanisms & Inorganic NCERT)",
+        topics: 0,
+        totalTopics: 15,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "neet-4",
+        title: "Physics (Mechanics, Optics & Electrodynamics)",
+        topics: 0,
+        totalTopics: 16,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "neet-5",
+        title: "Full Syllabus NEET Mocks & Error Log Review",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+    ];
+  }
+
+  if (lower.includes("jee")) {
+    return [
+      {
+        id: "jee-1",
+        title: "Mathematics (Calculus, Vectors & Coordinate Geometry)",
+        topics: 0,
+        totalTopics: 15,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "jee-2",
+        title: "Physics (Mechanics, Electrodynamics & Modern Physics)",
+        topics: 0,
+        totalTopics: 16,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "jee-3",
+        title: "Chemistry (Physical, Organic & Inorganic)",
+        topics: 0,
+        totalTopics: 15,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "jee-4",
+        title: "Advanced PYQs & Multi-Concept Problems",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "jee-5",
+        title: "Full CBT Mock Test Series & Rank Booster",
+        topics: 0,
+        totalTopics: 8,
+        tests: 0,
+        status: "Not Started",
+      },
+    ];
+  }
+
+  if (lower.includes("upsc")) {
+    return [
+      {
+        id: "upsc-1",
+        title: "General Studies 1 (History, Geography & Society)",
+        topics: 0,
+        totalTopics: 15,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "upsc-2",
+        title: "General Studies 2 (Polity, Governance & IR)",
+        topics: 0,
+        totalTopics: 14,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "upsc-3",
+        title: "General Studies 3 (Economy, Environment & Tech)",
+        topics: 0,
+        totalTopics: 14,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "upsc-4",
+        title: "General Studies 4 (Ethics, Integrity & Case Studies)",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "upsc-5",
+        title: "CSAT & Mains Answer Writing Practice",
+        topics: 0,
+        totalTopics: 8,
+        tests: 0,
+        status: "Not Started",
+      },
+    ];
+  }
+
+  if (lower.includes("cs") || lower.includes("computer") || lower.includes("coding")) {
+    return [
+      {
+        id: "gatecs-1",
+        title: "Data Structures & Algorithms",
+        topics: 0,
+        totalTopics: 14,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "gatecs-2",
+        title: "Operating Systems & System Concurrency",
+        topics: 0,
+        totalTopics: 12,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "gatecs-3",
+        title: "Database Management Systems (DBMS) & SQL",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "gatecs-4",
+        title: "Computer Networks & Protocols",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+      {
+        id: "gatecs-5",
+        title: "Theory of Computation & Compiler Design",
+        topics: 0,
+        totalTopics: 10,
+        tests: 0,
+        status: "Not Started",
+      },
+    ];
+  }
+
+  // Default GATE EE
+  return [
+    {
+      id: "gateee-1",
+      title: "Circuit Analysis & Network Theory",
+      topics: 0,
+      totalTopics: 12,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "gateee-2",
+      title: "Signals & Systems",
+      topics: 0,
+      totalTopics: 12,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "gateee-3",
+      title: "Electrical Machines",
+      topics: 0,
+      totalTopics: 10,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "gateee-4",
+      title: "Power Systems Protection & Stability",
+      topics: 0,
+      totalTopics: 14,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "gateee-5",
+      title: "Control Systems",
+      topics: 0,
+      totalTopics: 11,
+      tests: 0,
+      status: "Not Started",
+    },
   ];
 }
 
@@ -181,6 +476,48 @@ export const DEMO_STUDENT: User = {
     { subject: "Power Systems", percentage: 61 },
     { subject: "Control Systems", percentage: 43 },
   ],
+  studyRoadmap: [
+    {
+      id: "demo-1",
+      title: "Network Theory",
+      topics: 12,
+      totalTopics: 12,
+      tests: 2,
+      status: "Completed",
+    },
+    {
+      id: "demo-2",
+      title: "Signals & Systems",
+      topics: 8,
+      totalTopics: 12,
+      tests: 1,
+      status: "In Progress",
+    },
+    {
+      id: "demo-3",
+      title: "Electrical Machines",
+      topics: 0,
+      totalTopics: 10,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "demo-4",
+      title: "Power Systems",
+      topics: 0,
+      totalTopics: 14,
+      tests: 0,
+      status: "Not Started",
+    },
+    {
+      id: "demo-5",
+      title: "Control Systems",
+      topics: 0,
+      totalTopics: 11,
+      tests: 0,
+      status: "Not Started",
+    },
+  ],
   sessionsBooked: [
     {
       id: "s1",
@@ -228,6 +565,12 @@ interface AuthContextType {
   bookSession: (session: BookedSession) => void;
   updateSubjectProgress: (subjectName: string, deltaOrValue: number) => void;
   addMentorSession: (session: MentorSessionItem) => void;
+  addRoadmapItem: (item: Omit<RoadmapItem, "id">) => void;
+  updateRoadmapItem: (id: string, updates: Partial<RoadmapItem>) => void;
+  deleteRoadmapItem: (id: string) => void;
+  setRoadmap: (items: RoadmapItem[]) => void;
+  resetRoadmapToExamDefault: (exam?: string) => void;
+  updateGoalTitle: (title: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -382,6 +725,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const targetExam = data.targetExam || "Target Exam";
     const subjects = data.role === "student" ? getDefaultSubjectsForExam(targetExam) : undefined;
+    const studyRoadmap = data.role === "student" ? getDefaultRoadmapForExam(targetExam) : undefined;
 
     let expertiseList: string[] | undefined;
     if (data.role === "mentor") {
@@ -414,6 +758,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       goalProgress: 0,
       streakDays: 1,
       subjects,
+      studyRoadmap,
       sessionsBooked: [],
       mentorStats:
         data.role === "mentor"
@@ -524,6 +869,97 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateUserProfile(updated);
   };
 
+  const updateRoadmapItem = (id: string, updates: Partial<RoadmapItem>) => {
+    if (!user) return;
+    const currentRoadmap = user.studyRoadmap || getDefaultRoadmapForExam(user.targetExam);
+    const updatedRoadmap = currentRoadmap.map((item) => {
+      if (item.id === id) {
+        const merged: RoadmapItem = { ...item, ...updates };
+        if (merged.totalTopics > 0 && merged.topics >= merged.totalTopics) {
+          merged.status = "Completed";
+        } else if (merged.topics > 0 && merged.status === "Not Started") {
+          merged.status = "In Progress";
+        }
+        return merged;
+      }
+      return item;
+    });
+
+    const newProgress = calculateRoadmapProgress(updatedRoadmap);
+    const updated: User = {
+      ...user,
+      studyRoadmap: updatedRoadmap,
+      goalProgress: newProgress,
+    };
+    updateUserProfile(updated);
+  };
+
+  const addRoadmapItem = (itemData: Omit<RoadmapItem, "id">) => {
+    if (!user) return;
+    const currentRoadmap = user.studyRoadmap || getDefaultRoadmapForExam(user.targetExam);
+    const newItem: RoadmapItem = {
+      id: `milestone-${Date.now()}`,
+      ...itemData,
+    };
+    const updatedRoadmap = [...currentRoadmap, newItem];
+    const newProgress = calculateRoadmapProgress(updatedRoadmap);
+    const updated: User = {
+      ...user,
+      studyRoadmap: updatedRoadmap,
+      goalProgress: newProgress,
+    };
+    updateUserProfile(updated);
+  };
+
+  const deleteRoadmapItem = (id: string) => {
+    if (!user) return;
+    const currentRoadmap = user.studyRoadmap || getDefaultRoadmapForExam(user.targetExam);
+    const updatedRoadmap = currentRoadmap.filter((item) => item.id !== id);
+    const newProgress = calculateRoadmapProgress(updatedRoadmap);
+    const updated: User = {
+      ...user,
+      studyRoadmap: updatedRoadmap,
+      goalProgress: newProgress,
+    };
+    updateUserProfile(updated);
+  };
+
+  const setRoadmap = (items: RoadmapItem[]) => {
+    if (!user) return;
+    const newProgress = calculateRoadmapProgress(items);
+    const updated: User = {
+      ...user,
+      studyRoadmap: items,
+      goalProgress: newProgress,
+    };
+    updateUserProfile(updated);
+  };
+
+  const resetRoadmapToExamDefault = (examName?: string) => {
+    if (!user) return;
+    const target = examName || user.targetExam || "CAT";
+    const defaultItems = getDefaultRoadmapForExam(target);
+    const newProgress = calculateRoadmapProgress(defaultItems);
+    const updated: User = {
+      ...user,
+      targetExam: target,
+      headline: `Aspirant · ${target}`,
+      studyRoadmap: defaultItems,
+      goalProgress: newProgress,
+    };
+    updateUserProfile(updated);
+  };
+
+  const updateGoalTitle = (title: string) => {
+    if (!user) return;
+    const updated: User = {
+      ...user,
+      targetExam: title,
+      headline: `Aspirant · ${title}`,
+    };
+    updateUserProfile(updated);
+  };
+
   const logout = () => {
     clearUserSession();
     router.push("/login");
@@ -562,6 +998,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         bookSession,
         updateSubjectProgress,
         addMentorSession,
+        addRoadmapItem,
+        updateRoadmapItem,
+        deleteRoadmapItem,
+        setRoadmap,
+        resetRoadmapToExamDefault,
+        updateGoalTitle,
       }}
     >
       {children}

@@ -57,6 +57,7 @@ export default function StudentLayout({
   const displayName = user?.name || "Prince";
   const displayInitials = user?.initials || "P";
   const displayEmail = user?.email || "prince@seniorly.com";
+  const examQuery = user?.targetExam ? `?exam=${encodeURIComponent(user.targetExam.split(" ")[0])}` : "";
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-400 font-sans flex flex-col">
@@ -77,11 +78,12 @@ export default function StudentLayout({
 
           <nav className="hidden md:flex items-center gap-6">
             {TOP_NAV.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const itemHref = item.href === "/mentors" ? `${item.href}${examQuery}` : item.href;
+              const isActive = pathname === item.href || (item.href !== "/student/dashboard" && pathname.startsWith(item.href));
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={item.name}
+                  href={itemHref}
                   className={cn(
                     "text-sm font-medium transition-colors hover:text-white relative",
                     isActive ? "text-white" : "text-slate-400"
@@ -192,12 +194,13 @@ export default function StudentLayout({
         >
           <div className="flex flex-col gap-2 p-4">
             {SIDEBAR_NAV.map((item) => {
+              const itemHref = item.href === "/mentors" ? `${item.href}${examQuery}` : item.href;
               const isActive = pathname === item.href;
               const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={itemHref}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",

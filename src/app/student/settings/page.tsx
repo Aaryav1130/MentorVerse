@@ -287,7 +287,7 @@ export default function StudentSettingsPage() {
             </div>
 
             <Link
-              href="/mentors"
+              href={`/mentors?exam=${encodeURIComponent(user?.targetExam?.split(" ")[0] || "")}`}
               className="px-3.5 py-1.5 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-light hover:bg-brand-primary hover:text-white text-xs font-medium transition-colors"
             >
               Browse Mentors
@@ -329,7 +329,7 @@ export default function StudentSettingsPage() {
                 Choose a senior to unlock 1:1 strategy calls and roadmaps.
               </p>
               <Link
-                href="/mentors"
+                href={`/mentors?exam=${encodeURIComponent(user?.targetExam?.split(" ")[0] || "")}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-accent hover:bg-amber-400 text-black font-semibold text-xs transition-colors shadow-sm"
               >
                 <Compass className="w-4 h-4" />

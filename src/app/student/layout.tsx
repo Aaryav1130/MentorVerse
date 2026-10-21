@@ -28,20 +28,18 @@ const SIDEBAR_NAV = [
   { name: "Home", href: "/student/dashboard", icon: Home },
   { name: "My Goals", href: "/student/study-plan", icon: Target },
   { name: "Mentors", href: "/mentors", icon: Users },
-  { name: "Rooms", href: "/student/rooms", icon: Video },
-  { name: "Progress", href: "/student/progress", icon: Target },
-  { name: "Resources", href: "/student/resources", icon: BookOpen },
-  { name: "Doubts", href: "/student/sessions", icon: HelpCircle },
-  { name: "Calendar", href: "/student/calendar", icon: Calendar },
+  { name: "Rooms & Sessions", href: "/student/sessions", icon: Video },
+  { name: "Goal Roadmap", href: "/student/study-plan", icon: Target },
+  { name: "Doubts & Q&A", href: "/student/sessions", icon: HelpCircle },
   { name: "Settings", href: "/student/settings", icon: Settings },
 ];
 
 const TOP_NAV = [
   { name: "Home", href: "/student/dashboard" },
   { name: "Mentors", href: "/mentors" },
-  { name: "Rooms", href: "/student/rooms" },
-  { name: "Progress", href: "/student/progress" },
-  { name: "Resources", href: "/student/resources" },
+  { name: "My Goals", href: "/student/study-plan" },
+  { name: "Sessions", href: "/student/sessions" },
+  { name: "Settings", href: "/student/settings" },
 ];
 
 export default function StudentLayout({

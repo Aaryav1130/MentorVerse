@@ -35,7 +35,7 @@ export default function Footer() {
                   <rect x="50" y="28" width="14" height="36" rx="3" fill="#fff" />
                   <circle cx="57" cy="17" r="6" fill="#FBBF24" />
                 </svg>
-                Senior<span>ly</span>
+                <div>Senior<span>ly</span></div>
               </Link>
               <p>
                 Seniorly connects aspirants with seniors who have already cleared JEE, NEET, UPSC, GATE and CAT. Book live 1:1 or small group sessions with verified rank holders from IITs, NITs, AIIMS and other top institutes, and get a clear plan for your own preparation.

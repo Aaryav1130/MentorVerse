@@ -4,6 +4,7 @@ import { studentSessions, studentDoubts } from "@/lib/mock-data";
 import { BookOpen, FileText, PlaySquare, HelpCircle, CheckCircle2, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const TABS = ["Upcoming", "Past Sessions", "Doubts", "Resources"];
 
@@ -11,20 +12,19 @@ export default function SessionsPage() {
   const [activeTab, setActiveTab] = useState("Upcoming");
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto">
-      
+    <div className="p-4 md:p-8 max-w-6xl mx-auto font-sans pb-16">
       <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">Sessions & Doubts</h1>
 
       {/* Tabs */}
-      <div className="flex overflow-x-auto hide-scrollbar border-borderorder border-[#1e293b] mb-8">
+      <div className="flex overflow-x-auto hide-scrollbar border-b border-[#1e293b] mb-8">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "px-4 py-3 text-sm font-medium whitespace-nowrap border-borderorder-2 transition-colors",
+              "px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors",
               activeTab === tab
-                ? "border-borderordermerald-500 text-brand-light"
+                ? "border-brand-primary text-brand-light font-semibold"
                 : "border-transparent text-slate-400 hover:text-slate-200"
             )}
           >
@@ -34,17 +34,18 @@ export default function SessionsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
-          
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Upcoming Sessions</h2>
           </div>
 
           <div className="space-y-4">
             {studentSessions.map((session) => (
-              <div key={session.id} className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div
+                key={session.id}
+                className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm"
+              >
                 <div>
                   <div className="inline-block px-2 py-1 rounded text-[10px] font-bold tracking-wider bg-slate-800 text-slate-300 uppercase mb-2">
                     {session.tag}
@@ -53,7 +54,7 @@ export default function SessionsPage() {
                   <p className="text-sm text-slate-400 mb-1">with {session.mentor}</p>
                   <p className="text-sm font-medium text-brand-accent">{session.time}</p>
                 </div>
-                <button className="w-full md:w-auto px-6 py-2.5 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg font-medium transition-colors">
+                <button className="w-full md:w-auto px-6 py-2.5 bg-brand-primary hover:bg-[#4338CA] text-white rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-md shadow-brand-primary/20">
                   Join Meeting
                 </button>
               </div>
@@ -62,12 +63,14 @@ export default function SessionsPage() {
 
           <div className="flex items-center justify-between mt-12 mb-4">
             <h2 className="text-xl font-bold text-white">Recent Doubts</h2>
-            <button className="text-sm text-brand-light hover:text-on-dark-accent font-medium">Ask a Doubt &rarr;</button>
+            <button className="text-sm text-brand-light hover:underline font-medium">
+              Ask a Doubt &rarr;
+            </button>
           </div>
 
           <div className="space-y-4">
             {studentDoubts.map((doubt) => (
-              <div key={doubt.id} className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5">
+              <div key={doubt.id} className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-5 shadow-sm">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
                     <HelpCircle className="w-5 h-5 text-slate-400" />
@@ -76,7 +79,7 @@ export default function SessionsPage() {
                     <h3 className="text-white font-medium mb-2">{doubt.question}</h3>
                     <div className="flex items-center gap-4 text-sm">
                       <span className="text-slate-500">{doubt.time}</span>
-                      <span className="flex items-center gap-1 text-brand-light">
+                      <span className="flex items-center gap-1 text-emerald-400 font-medium">
                         <CheckCircle2 className="w-4 h-4" /> {doubt.status}
                       </span>
                     </div>
@@ -85,21 +88,23 @@ export default function SessionsPage() {
               </div>
             ))}
           </div>
-
         </div>
 
         {/* Sidebar Area */}
         <div className="space-y-6">
-          <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6">
+          <div className="bg-[#141b2d] rounded-xl border border-[#1e293b] p-6 shadow-sm">
             <h2 className="text-lg font-bold text-white mb-4">Study Resources</h2>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: "Notes", icon: FileText, color: "text-blue-400", bg: "bg-cardlue-500/10" },
-                { label: "PYQs", icon: BookOpen, color: "text-brand-accent", bg: "bg-cardrand-accent/10" },
+                { label: "Notes", icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" },
+                { label: "PYQs", icon: BookOpen, color: "text-amber-400", bg: "bg-amber-400/10" },
                 { label: "Video Lectures", icon: PlaySquare, color: "text-rose-400", bg: "bg-rose-500/10" },
-                { label: "Practice Tests", icon: FileText, color: "text-brand-light", bg: "bg-cardrand-primary/10" },
+                { label: "Practice Tests", icon: FileText, color: "text-brand-light", bg: "bg-brand-primary/10" },
               ].map((res, i) => (
-                <button key={i} className="flex flex-col items-center justify-center p-4 bg-[#0a0e1a] border border-[#1e293b] rounded-xl hover:border-slate-600 transition-colors gap-3">
+                <button
+                  key={i}
+                  className="flex flex-col items-center justify-center p-4 bg-[#0a0e1a] border border-[#1e293b] rounded-xl hover:border-slate-600 transition-colors gap-3"
+                >
                   <div className={cn("p-3 rounded-full", res.bg)}>
                     <res.icon className={cn("w-6 h-6", res.color)} />
                   </div>
@@ -109,18 +114,22 @@ export default function SessionsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900 rounded-xl border border-borderordermerald-500/20 p-6 text-center">
-            <div className="w-12 h-12 bg-cardrand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-gradient-to-br from-indigo-950/40 via-slate-900 to-[#141b2d] rounded-xl border border-brand-primary/20 p-6 text-center shadow-lg">
+            <div className="w-12 h-12 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <MessageSquare className="w-6 h-6 text-brand-light" />
             </div>
             <h3 className="text-white font-bold mb-2">Need quick help?</h3>
-            <p className="text-sm text-slate-400 mb-4">Connect with an available mentor for an instant 15-min doubt session.</p>
-            <button className="w-full py-2 bg-cardrand-primary hover:bg-cardrand-light text-white rounded-lg text-sm font-medium transition-colors">
+            <p className="text-sm text-slate-400 mb-4">
+              Connect with an available mentor for an instant 15-min doubt session.
+            </p>
+            <Link
+              href="/mentors"
+              className="inline-block w-full py-2.5 bg-brand-primary hover:bg-[#4338CA] text-white rounded-xl text-sm font-semibold transition-colors shadow-md shadow-brand-primary/20"
+            >
               Find Mentor Now
-            </button>
+            </Link>
           </div>
         </div>
-
       </div>
     </div>
   );

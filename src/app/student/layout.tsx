@@ -28,9 +28,7 @@ const SIDEBAR_NAV = [
   { name: "Home", href: "/student/dashboard", icon: Home },
   { name: "My Goals", href: "/student/study-plan", icon: Target },
   { name: "Mentors", href: "/mentors", icon: Users },
-  { name: "Rooms & Sessions", href: "/student/sessions", icon: Video },
-  { name: "Goal Roadmap", href: "/student/study-plan", icon: Target },
-  { name: "Doubts & Q&A", href: "/student/sessions", icon: HelpCircle },
+  { name: "Sessions & Doubts", href: "/student/sessions", icon: Video },
   { name: "Settings", href: "/student/settings", icon: Settings },
 ];
 
@@ -38,7 +36,7 @@ const TOP_NAV = [
   { name: "Home", href: "/student/dashboard" },
   { name: "Mentors", href: "/mentors" },
   { name: "My Goals", href: "/student/study-plan" },
-  { name: "Sessions", href: "/student/sessions" },
+  { name: "Sessions & Doubts", href: "/student/sessions" },
   { name: "Settings", href: "/student/settings" },
 ];
 
@@ -197,7 +195,7 @@ export default function StudentLayout({
               const Icon = item.icon;
               return (
                 <Link
-                  key={item.href}
+                  key={item.name}
                   href={itemHref}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(

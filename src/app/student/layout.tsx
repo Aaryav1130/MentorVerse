@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   Bell,
@@ -46,14 +46,39 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname() || "";
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const { user, logout, switchRole } = useAuth();
+  const { user, isLoading, logout, switchRole } = useAuth();
 
-  const displayName = user?.name || "Prince";
-  const displayInitials = user?.initials || "P";
-  const displayEmail = user?.email || "prince@seniorly.com";
-  const examQuery = user?.targetExam ? `?exam=${encodeURIComponent(user.targetExam.split(" ")[0])}` : "";
+  // Authentication & Role Route Guard
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        router.replace(`/login?redirect=${encodeURIComponent(pathname || "/student/dashboard")}`);
+      } else if (user.role !== "student") {
+        router.replace("/mentor/dashboard");
+      }
+    }
+  }, [user, isLoading, router, pathname]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0e1a] flex flex-col items-center justify-center gap-3 text-slate-400">
+        <div className="w-9 h-9 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs">Verifying student session...</p>
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "student") {
+    return null;
+  }
+
+  const displayName = user.name;
+  const displayInitials = user.initials || "S";
+  const displayEmail = user.email;
+  const examQuery = user.targetExam ? `?exam=${encodeURIComponent(user.targetExam.split(" ")[0])}` : "";
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-slate-400 font-sans flex flex-col">

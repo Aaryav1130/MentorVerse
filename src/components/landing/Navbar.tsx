@@ -1,7 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 import "./hero.css";
 
 export default function Navbar() {
+  const { user } = useAuth();
+
+  const forStudentsHref =
+    user?.role === "student"
+      ? "/student/dashboard"
+      : user?.role === "mentor"
+      ? "/mentors"
+      : "/login?redirect=%2Fstudent%2Fdashboard";
+
+  const dashboardHref =
+    user?.role === "mentor" ? "/mentor/dashboard" : "/student/dashboard";
+
   return (
     <nav className="sl-nav">
       <div className="sl-wrap">
@@ -18,12 +33,20 @@ export default function Navbar() {
         <div className="sl-links">
           <Link className="sl-active" href="/">Home</Link>
           <Link href="/mentors">Mentors</Link>
-          <Link href="/student/dashboard">For Students</Link>
+          <Link href={forStudentsHref}>For Students</Link>
           <Link href="#">About</Link>
         </div>
         <div className="sl-navr">
-          <Link className="sl-btn" href="/login">Log in</Link>
-          <Link className="sl-btn sl-p" href="/register">Get started</Link>
+          {user ? (
+            <Link className="sl-btn sl-p" href={dashboardHref}>
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link className="sl-btn" href="/login">Log in</Link>
+              <Link className="sl-btn sl-p" href="/register">Get started</Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

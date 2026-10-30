@@ -1,19 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { LogIn, ArrowRight, Sparkles, GraduationCap, Briefcase, AlertCircle } from "lucide-react";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
   const { login, loginAsDemo } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const redirectAfterAuth = (userRole: "student" | "mentor") => {
+    if (redirectParam && redirectParam.startsWith("/")) {
+      router.push(redirectParam);
+    } else if (userRole === "mentor") {
+      router.push("/mentor/dashboard");
+    } else {
+      router.push("/student/dashboard");
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +38,7 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
       const user = await login(email, password);
-      if (user.role === "mentor") {
-        router.push("/mentor/dashboard");
-      } else {
-        router.push("/student/dashboard");
-      }
+      redirectAfterAuth(user.role);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("NO_ACCOUNT_FOUND")) {
@@ -56,11 +64,7 @@ export default function LoginPage() {
       // If user typed an email, try that; otherwise test demo student
       const targetEmail = email.trim() || "prince@seniorly.com";
       const user = await login(targetEmail);
-      if (user.role === "mentor") {
-        router.push("/mentor/dashboard");
-      } else {
-        router.push("/student/dashboard");
-      }
+      redirectAfterAuth(user.role);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("NO_ACCOUNT_FOUND")) {
@@ -77,11 +81,7 @@ export default function LoginPage() {
 
   const handleQuickDemo = (role: "student" | "mentor") => {
     loginAsDemo(role);
-    if (role === "mentor") {
-      router.push("/mentor/dashboard");
-    } else {
-      router.push("/student/dashboard");
-    }
+    redirectAfterAuth(role);
   };
 
   return (
@@ -310,5 +310,19 @@ export default function LoginPage() {
         Seniorly · Connect with seniors who cracked it.
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0e1a] text-slate-400 flex items-center justify-center text-sm">
+          Loading sign in...
+        </div>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

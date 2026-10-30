@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Users, 
@@ -41,11 +41,36 @@ export default function MentorLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, logout, switchRole } = useAuth();
+  const router = useRouter();
+  const { user, isLoading, logout, switchRole } = useAuth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
-  const displayName = user?.name || mentorProfile.name;
-  const displayInitials = user?.initials || mentorProfile.initials;
+  // Authentication & Role Route Guard
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        router.replace(`/login?redirect=${encodeURIComponent(pathname || "/mentor/dashboard")}`);
+      } else if (user.role !== "mentor") {
+        router.replace("/student/dashboard");
+      }
+    }
+  }, [user, isLoading, router, pathname]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full bg-[#0a0e1a] flex-col items-center justify-center gap-3 text-slate-400">
+        <div className="w-9 h-9 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs">Verifying mentor session...</p>
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "mentor") {
+    return null;
+  }
+
+  const displayName = user.name;
+  const displayInitials = user.initials || "M";
 
   return (
     <div className="flex h-screen w-full bg-[#0a0e1a] text-slate-400 font-sans">

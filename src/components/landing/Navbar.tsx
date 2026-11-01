@@ -34,7 +34,7 @@ export default function Navbar() {
           <Link className="sl-active" href="/">Home</Link>
           <Link href="/mentors">Mentors</Link>
           <Link href={forStudentsHref}>For Students</Link>
-          <Link href="#">About</Link>
+          <a href="#about">About</a>
         </div>
         <div className="sl-navr">
           {user ? (

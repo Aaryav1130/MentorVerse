@@ -9,7 +9,7 @@
 .sf-btn{display:inline-flex;align-items:center;border-radius:999px;padding:11px 24px;font-weight:500;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;font-family:inherit}
 .sf-btn.sf-p{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:var(--shadow)}
 .sf-btn.sf-p:hover{background:#4338CA}
-.sf-footer{background:#fff;padding:56px 0 0}
+.sf-footer{background:#fff;padding:56px 0 0;scroll-margin-top:64px}
 .sf-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
 .sf-logo{display:inline-flex;align-items:center;gap:10px;font-weight:500;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
 .sf-logo span{color:var(--brand2)}

@@ -23,7 +23,7 @@ export default function Footer() {
         </div>
       </section>
 
-      <footer className="sf-footer">
+      <footer className="sf-footer" id="about">
         <div className="sf-wrap">
           <div className="sf-grid">
             <div className="sf-brand">
@@ -129,7 +129,7 @@ export default function Footer() {
               <h4 className="sf-h">Company</h4>
               <ul className="sf-links">
                 <li>
-                  <Link href="#">About Us</Link>
+                  <a href="#about">About Us</a>
                 </li>
                 <li>
                   <Link href="#">Careers</Link>

@@ -105,7 +105,7 @@ export default function MentorProfilePage() {
             >
               For Students
             </Link>
-            <Link href="/about" className="text-sm font-medium text-slate-400 hover:text-white">
+            <Link href="/#about" className="text-sm font-medium text-slate-400 hover:text-white">
               About
             </Link>
           </nav>

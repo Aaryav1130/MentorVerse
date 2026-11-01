@@ -24,6 +24,10 @@
   scrollbar-color: var(--color-brand-primary) var(--color-brand-deep);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);

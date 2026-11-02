@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, GOOGLE_CLIENT_ID } from "@/lib/auth-context";
+import { useGoogleLogin } from "@react-oauth/google";
 import { ArrowLeft, Briefcase, Award, Sparkles } from "lucide-react";
 
 export default function MentorRegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, loginWithGoogleUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -48,22 +49,46 @@ export default function MentorRegisterPage() {
     }
   };
 
-  const handleGoogleSignup = async () => {
-    try {
-      setLoading(true);
-      await register({
-        name: name || "Senior Mentor",
-        email: email || "mentor@seniorly.com",
-        role: "mentor",
-        college,
-        rank,
-        expertise,
-        hourlyRate: rate,
-      });
-      router.push("/mentor/dashboard");
-    } finally {
-      setLoading(false);
+  const triggerGoogleSignup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch Google profile");
+        const profile = await res.json();
+        await loginWithGoogleUser({
+          name: profile.name || name || "Senior Mentor",
+          email: profile.email,
+          avatar: profile.picture,
+          googleId: profile.sub,
+          role: "mentor",
+          college,
+          rank,
+          expertise,
+          hourlyRate: rate,
+        });
+        router.push("/mentor/dashboard");
+      } catch (err: unknown) {
+        console.error("Google mentor registration error:", err);
+        setError("Google registration failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError("Google sign-up was cancelled or failed. Please try again.");
+    },
+  });
+
+  const handleGoogleSignup = () => {
+    if (!GOOGLE_CLIENT_ID) {
+      setError("Google sign-up is currently unavailable. Please register with email.");
+      return;
     }
+    triggerGoogleSignup();
   };
 
   return (

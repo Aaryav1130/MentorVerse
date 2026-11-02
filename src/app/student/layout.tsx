@@ -138,8 +138,12 @@ export default function StudentLayout({
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className="flex items-center gap-2 text-left hover:opacity-90 transition-opacity pl-2"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary font-semibold text-white shadow-md">
-                  {displayInitials}
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary font-semibold text-white shadow-md overflow-hidden">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={displayName} className="h-full w-full object-cover" />
+                  ) : (
+                    displayInitials
+                  )}
                 </div>
                 <div className="hidden lg:block">
                   <div className="flex items-center gap-1">

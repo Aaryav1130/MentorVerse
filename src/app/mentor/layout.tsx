@@ -142,8 +142,12 @@ export default function MentorLayout({
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className="flex items-center gap-3 pl-6 border-l border-[#1e293b] hover:opacity-90 transition-opacity text-left"
               >
-                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold">
-                  {displayInitials}
+                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold overflow-hidden">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={displayName} className="h-full w-full object-cover" />
+                  ) : (
+                    displayInitials
+                  )}
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center gap-1.5">

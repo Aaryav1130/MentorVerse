@@ -2,6 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+export const DEFAULT_GOOGLE_CLIENT_ID =
+  "921678413266-9ee1pusi0jeoosrgerlm4pndk4c4ogr2.apps.googleusercontent.com";
+
+export const GOOGLE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
 
 export type UserRole = "student" | "mentor";
 
@@ -545,6 +552,18 @@ interface AuthContextType {
   role: UserRole | null;
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<User>;
+  loginWithGoogleUser: (data: {
+    name: string;
+    email: string;
+    avatar?: string;
+    googleId?: string;
+    role?: UserRole;
+    targetExam?: string;
+    college?: string;
+    rank?: string;
+    expertise?: string | string[];
+    hourlyRate?: string;
+  }) => Promise<User>;
   loginAsDemo: (role: UserRole) => User;
   register: (userData: {
     name: string;
@@ -691,6 +710,111 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     saveUserSession(match.user);
     setIsLoading(false);
     return match.user;
+  };
+
+  const loginWithGoogleUser = async (data: {
+    name: string;
+    email: string;
+    avatar?: string;
+    googleId?: string;
+    role?: UserRole;
+    targetExam?: string;
+    college?: string;
+    rank?: string;
+    expertise?: string | string[];
+    hourlyRate?: string;
+  }): Promise<User> => {
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const normalizedEmail = data.email.trim().toLowerCase();
+    const accounts = getStoredRegisteredAccounts();
+
+    // Check if account already exists
+    const match = accounts.find(
+      (acc) => acc.user.email.toLowerCase() === normalizedEmail
+    );
+
+    if (match) {
+      // Existing user: preserve progress, update avatar if newly provided
+      const updatedUser: User = {
+        ...match.user,
+        avatar: data.avatar || match.user.avatar,
+      };
+      const idx = accounts.findIndex(
+        (acc) => acc.user.email.toLowerCase() === normalizedEmail
+      );
+      accounts[idx].user = updatedUser;
+      saveRegisteredAccounts(accounts);
+      saveUserSession(updatedUser);
+      setIsLoading(false);
+      return updatedUser;
+    }
+
+    // New Google user: create fresh personalized profile
+    const role: UserRole = data.role || "student";
+    const initials =
+      data.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U";
+
+    const targetExam = data.targetExam || "GATE CS 2027";
+    const subjects = role === "student" ? getDefaultSubjectsForExam(targetExam) : undefined;
+    const studyRoadmap = role === "student" ? getDefaultRoadmapForExam(targetExam) : undefined;
+
+    let expertiseList: string[] | undefined;
+    if (role === "mentor") {
+      if (Array.isArray(data.expertise)) {
+        expertiseList = data.expertise;
+      } else if (typeof data.expertise === "string" && data.expertise.trim()) {
+        expertiseList = data.expertise.split(",").map((s) => s.trim());
+      } else {
+        expertiseList = ["Concept Clarity", "Exam Strategy", "Problem Solving"];
+      }
+    }
+
+    const newUser: User = {
+      id: `google-${data.googleId || Date.now()}`,
+      name: data.name,
+      email: normalizedEmail,
+      role,
+      initials,
+      avatar: data.avatar,
+      headline:
+        role === "mentor"
+          ? `${data.college || "Senior"} Mentor · ${data.rank || "Verified Ranker"}`
+          : `Aspirant · ${targetExam}`,
+      targetExam: role === "student" ? targetExam : undefined,
+      college: data.college,
+      rank: data.rank,
+      expertise: expertiseList,
+      hourlyRate: data.hourlyRate || "₹999 / session",
+      isDemo: false,
+      assignedMentor: null,
+      goalProgress: 0,
+      streakDays: 1,
+      subjects,
+      studyRoadmap,
+      sessionsBooked: [],
+      mentorStats:
+        role === "mentor"
+          ? { totalStudents: 0, activeRooms: 0, monthlyEarnings: 0 }
+          : undefined,
+      mentorSessions: [],
+    };
+
+    accounts.push({
+      user: newUser,
+      password: "google-authenticated",
+    });
+
+    saveRegisteredAccounts(accounts);
+    saveUserSession(newUser);
+    setIsLoading(false);
+    return newUser;
   };
 
   const loginAsDemo = (role: UserRole): User => {
@@ -982,32 +1106,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        role: user?.role || null,
-        isLoading,
-        login,
-        loginAsDemo,
-        register,
-        logout,
-        switchRole,
-        updateUserProfile,
-        assignMentor,
-        removeMentor,
-        bookSession,
-        updateSubjectProgress,
-        addMentorSession,
-        addRoadmapItem,
-        updateRoadmapItem,
-        deleteRoadmapItem,
-        setRoadmap,
-        resetRoadmapToExamDefault,
-        updateGoalTitle,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <AuthContext.Provider
+        value={{
+          user,
+          role: user?.role || null,
+          isLoading,
+          login,
+          loginWithGoogleUser,
+          loginAsDemo,
+          register,
+          logout,
+          switchRole,
+          updateUserProfile,
+          assignMentor,
+          removeMentor,
+          bookSession,
+          updateSubjectProgress,
+          addMentorSession,
+          addRoadmapItem,
+          updateRoadmapItem,
+          deleteRoadmapItem,
+          setRoadmap,
+          resetRoadmapToExamDefault,
+          updateGoalTitle,
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </GoogleOAuthProvider>
   );
 }
 

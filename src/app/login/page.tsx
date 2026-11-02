@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, GOOGLE_CLIENT_ID } from "@/lib/auth-context";
+import { useGoogleLogin } from "@react-oauth/google";
 import { LogIn, ArrowRight, Sparkles, GraduationCap, Briefcase, AlertCircle } from "lucide-react";
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get("redirect");
-  const { login, loginAsDemo } = useAuth();
+  const { login, loginWithGoogleUser, loginAsDemo } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,26 +58,44 @@ function LoginPageContent() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      // If user typed an email, try that; otherwise test demo student
-      const targetEmail = email.trim() || "prince@seniorly.com";
-      const user = await login(targetEmail);
-      redirectAfterAuth(user.role);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("NO_ACCOUNT_FOUND")) {
-        setError(
-          "NO_ACCOUNT_FOUND: No registered account found with this Google email. Please register first to choose your role (Student or Mentor)."
-        );
-      } else {
-        setError("Google authentication failed. Please register or verify your account.");
+  const triggerGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        if (!res.ok) {
+          throw new Error("Failed to fetch Google profile");
+        }
+        const profile = await res.json();
+        const authenticatedUser = await loginWithGoogleUser({
+          name: profile.name || "Google User",
+          email: profile.email,
+          avatar: profile.picture,
+          googleId: profile.sub,
+        });
+        redirectAfterAuth(authenticatedUser.role);
+      } catch (err: unknown) {
+        console.error("Google authentication error:", err);
+        setError("Google authentication failed. Please try again.");
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
+    },
+    onError: (errorResponse) => {
+      console.warn("Google login cancelled or failed:", errorResponse);
+      setError("Google sign-in was cancelled or failed. Please try again.");
+    },
+  });
+
+  const handleGoogleLogin = () => {
+    if (!GOOGLE_CLIENT_ID) {
+      setError("Google authentication is currently unavailable. Please register or sign in with your email.");
+      return;
     }
+    triggerGoogleLogin();
   };
 
   const handleQuickDemo = (role: "student" | "mentor") => {

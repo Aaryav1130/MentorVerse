@@ -79,6 +79,21 @@ export async function fetchStudentRoadmapFromDb(studentId: string): Promise<Road
 
 export async function syncRoadmapToDb(studentId: string, items: RoadmapItem[]) {
   try {
+    // Only sync if studentId is a valid UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(studentId);
+    if (!isUuid) return;
+
+    // Ensure student record exists in students table
+    const { data: stExists } = await supabase
+      .from("students")
+      .select("user_id")
+      .eq("user_id", studentId)
+      .maybeSingle();
+
+    if (!stExists) {
+      await supabase.from("students").insert({ user_id: studentId }).select();
+    }
+
     // Delete existing items for student and replace with updated batch
     await supabase.from("study_roadmap").delete().eq("student_id", studentId);
 

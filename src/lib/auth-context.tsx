@@ -8,6 +8,7 @@ import {
   syncRoadmapToDb,
   updateStudentExamInDb,
 } from "./supabase/database";
+import { supabase } from "./supabase/client";
 
 export const DEFAULT_GOOGLE_CLIENT_ID =
   "921678413266-9ee1pusi0jeoosrgerlm4pndk4c4ogr2.apps.googleusercontent.com";
@@ -718,6 +719,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (!match) {
+      // Check if user exists in Supabase Auth
+      try {
+        const { data: authData } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password: password || "Password123!",
+        });
+        if (authData?.user) {
+          const userMeta = authData.user.user_metadata || {};
+          const role: UserRole = userMeta.role === "mentor" ? "mentor" : "student";
+          const targetExam = userMeta.target_exam || "GATE EE 2027";
+          const supUser: User = {
+            id: authData.user.id,
+            name: userMeta.full_name || userMeta.name || "Student Aspirant",
+            email: normalizedEmail,
+            role,
+            initials: (userMeta.full_name || "S").slice(0, 2).toUpperCase(),
+            targetExam: role === "student" ? targetExam : undefined,
+            isDemo: false,
+            assignedMentor: null,
+            goalProgress: 0,
+            streakDays: 1,
+            subjects: role === "student" ? getDefaultSubjectsForExam(targetExam) : undefined,
+            studyRoadmap: role === "student" ? getDefaultRoadmapForExam(targetExam) : undefined,
+            sessionsBooked: [],
+          };
+          saveUserSession(supUser);
+          setIsLoading(false);
+          return supUser;
+        }
+      } catch {
+        // ignore
+      }
+
       setIsLoading(false);
       throw new Error(
         "NO_ACCOUNT_FOUND: No registered account found with this email. Please register first to choose your role (Student or Mentor)."
@@ -802,8 +836,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // Register Google user in Supabase Auth to get a real PostgreSQL UUID & trigger public.profiles creation
+    let realUserId = `google-${data.googleId || Date.now()}`;
+    try {
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password: `GoogleAuth-${data.googleId || 'SecurePass123!'}`,
+        options: {
+          data: {
+            full_name: data.name,
+            name: data.name,
+            role,
+            target_exam: targetExam,
+            avatar_url: data.avatar || "",
+            picture: data.avatar || "",
+          },
+        },
+      });
+
+      if (authData?.user?.id) {
+        realUserId = authData.user.id;
+      } else if (authErr) {
+        console.warn("Supabase Google signUp note:", authErr.message);
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password: `GoogleAuth-${data.googleId || 'SecurePass123!'}`,
+        });
+        if (signInData?.user?.id) {
+          realUserId = signInData.user.id;
+        }
+      }
+    } catch (err) {
+      console.warn("Supabase auth error during Google login:", err);
+    }
+
     const newUser: User = {
-      id: `google-${data.googleId || Date.now()}`,
+      id: realUserId,
       name: data.name,
       email: normalizedEmail,
       role,
@@ -839,6 +907,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     saveRegisteredAccounts(accounts);
     saveUserSession(newUser);
+
+    if (studyRoadmap && studyRoadmap.length > 0) {
+      syncRoadmapToDb(realUserId, studyRoadmap);
+    }
+
     setIsLoading(false);
     return newUser;
   };
@@ -888,8 +961,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // Register user in Supabase Auth to get a real PostgreSQL UUID & trigger public.profiles creation
+    let realUserId = `user-${Date.now()}`;
+    try {
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password: data.password || "Password123!",
+        options: {
+          data: {
+            full_name: data.name,
+            name: data.name,
+            role: data.role,
+            target_exam: targetExam,
+            college: data.college || "",
+            rank: data.rank || "",
+          },
+        },
+      });
+
+      if (authData?.user?.id) {
+        realUserId = authData.user.id;
+      } else if (authErr) {
+        console.warn("Supabase signUp note:", authErr.message);
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password: data.password || "Password123!",
+        });
+        if (signInData?.user?.id) {
+          realUserId = signInData.user.id;
+        }
+      }
+    } catch (err) {
+      console.warn("Supabase auth error during register:", err);
+    }
+
     const newUser: User = {
-      id: `user-${Date.now()}`,
+      id: realUserId,
       name: data.name,
       email: data.email,
       role: data.role,
@@ -934,6 +1041,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     saveRegisteredAccounts(accounts);
     saveUserSession(newUser);
+
+    if (studyRoadmap && studyRoadmap.length > 0) {
+      syncRoadmapToDb(realUserId, studyRoadmap);
+    }
+
     setIsLoading(false);
     return newUser;
   };

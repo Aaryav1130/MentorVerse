@@ -3,6 +3,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import {
+  fetchStudentRoadmapFromDb,
+  syncRoadmapToDb,
+  updateStudentExamInDb,
+} from "./supabase/database";
 
 export const DEFAULT_GOOGLE_CLIENT_ID =
   "921678413266-9ee1pusi0jeoosrgerlm4pndk4c4ogr2.apps.googleusercontent.com";
@@ -631,12 +636,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount and sync with Supabase
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsedUser: User = JSON.parse(stored);
+        setUser(parsedUser);
+
+        // Fetch latest roadmap from Supabase if real user
+        if (!parsedUser.isDemo) {
+          fetchStudentRoadmapFromDb(parsedUser.id).then((dbRoadmap) => {
+            if (dbRoadmap && dbRoadmap.length > 0) {
+              const progress = calculateRoadmapProgress(dbRoadmap);
+              const refreshed: User = {
+                ...parsedUser,
+                studyRoadmap: dbRoadmap,
+                goalProgress: progress,
+              };
+              setUser(refreshed);
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(refreshed));
+              } catch {
+                // ignore
+              }
+            }
+          });
+        }
       }
     } catch {
       // ignore
@@ -926,6 +952,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     saveUserSession(updated);
+
+    // Sync to Supabase in background for real accounts
+    if (!updated.isDemo) {
+      if (updates.studyRoadmap) {
+        syncRoadmapToDb(updated.id, updates.studyRoadmap);
+      }
+      if (updates.targetExam) {
+        updateStudentExamInDb(updated.id, updates.targetExam);
+      }
+    }
   };
 
   const assignMentor = (mentor: AssignedMentor) => {

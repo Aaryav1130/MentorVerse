@@ -159,6 +159,9 @@ export async function createBookingInDb(booking: {
   meetingUrl?: string;
 }) {
   try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(booking.studentId);
+    if (!isUuid) return null;
+
     const { data, error } = await supabase.from("bookings").insert({
       student_id: booking.studentId,
       mentor_id: booking.mentorId,
@@ -177,6 +180,60 @@ export async function createBookingInDb(booking: {
     return data;
   } catch (err) {
     console.warn("Exception creating booking in Supabase:", err);
+    return null;
+  }
+}
+
+// ---------------- DOUBTS & Q&A ----------------
+export async function createDoubtInDb(doubt: {
+  studentId: string;
+  mentorId?: string | null;
+  subject: string;
+  question: string;
+  answer?: string;
+}) {
+  try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(doubt.studentId);
+    if (!isUuid) return null;
+
+    const { data, error } = await supabase.from("doubts").insert({
+      student_id: doubt.studentId,
+      mentor_id: doubt.mentorId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(doubt.mentorId) ? doubt.mentorId : null,
+      subject: doubt.subject,
+      question: doubt.question,
+      answer: doubt.answer || null,
+      status: doubt.answer ? "answered" : "open",
+    }).select().single();
+
+    if (error) {
+      console.warn("Error creating doubt in Supabase:", error.message);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.warn("Exception creating doubt in Supabase:", err);
+    return null;
+  }
+}
+
+export async function fetchStudentDoubtsFromDb(studentId: string) {
+  try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(studentId);
+    if (!isUuid) return null;
+
+    const { data, error } = await supabase
+      .from("doubts")
+      .select("*")
+      .eq("student_id", studentId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.warn("Error fetching doubts from Supabase:", error.message);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.warn("Exception fetching doubts from Supabase:", err);
     return null;
   }
 }
